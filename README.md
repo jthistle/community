@@ -1,4 +1,7 @@
 # Community
 A community simulator written in Python.
 
-More details and files to follow, watch/star to stay updated.
+I'll write a proper explanation of what this is and how it works soon, watch/star to stay updated.
+
+## WORK IN PROGRESS AT THE MOMENT - LIKELY BROKEN
+
