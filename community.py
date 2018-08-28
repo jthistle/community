@@ -11,7 +11,7 @@ class Community:
 
 	def __init__(self):
 		self.families = []
-		self.date = 2 # SET TO 0
+		self.date = 0 # SET TO 0 IF NOT
 		self.harshWinter = False
 
 		# generate 3 families, each with 2 adults and randomly 0-3 children
@@ -71,6 +71,8 @@ class Community:
 			# Give enough food for the year
 			tempFamily.food = (10*2 + 6*childrenCount)*4
 
+		# Show who's in the community
+		print(self)
 		# Pass time once without increasing the date
 		self.passTime()
 
@@ -91,8 +93,8 @@ class Community:
 		# Harsh winter, other events
 		# Social interactions
 		# People actions based on final mood and events during social interactions
-		
-		print(self.dateToString())
+
+		print("\n\n==== {} ====".format(self.dateToString().upper()))
 		for f in self.families:
 			f.passTime(self.date%4, self.harshWinter)
 

@@ -23,7 +23,7 @@ class Person:
 	# TODO hardcoded: place in config file
 	__genders = ["male", "female"]
 	__attributes = ["o", "c", "e", "a", "n", "p", "i"]
-	__capCutoff = 3
+	__capCutoff = 3.5
 
 	def __init__(self, parents, partner=None, gender="", age=0, surname=""):
 		self.parents = parents

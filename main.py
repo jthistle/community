@@ -12,7 +12,12 @@ def main():
 
 	community = Community()
 
-	print(str(community))
+	while True:
+		input()
+		community.date += 1
+		community.passTime()
+
+	
 
 	'''f1= Family()
 	#community.addFamily(f1)

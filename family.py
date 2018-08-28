@@ -146,6 +146,14 @@ class Family:
 			if self.food > startFood:
 				madeProfit = True
 				print("The family made a profit of {} units of food".format(self.food-startFood))
+			else:
+				print("The family made a loss of {} units of food".format(self.food-startFood))
+		elif self.profession == "farmer":
+			# just some flavour text
+			if season == 0:
+				print("The family is sowing the fields")
+			elif season == 3:
+				print("The remains of the harvest wither and die in the cold")
 
 
 		for p in self.people:
