@@ -41,7 +41,7 @@ class Person:
 
 		# Attributes are based on a truncated gaussian distribution
 		for attr in self.__attributes:
-			self.attributes[attr] = round(random.gauss(0.5, 0.2), 2)
+			self.attributes[attr] = min(1, max(0, round(random.gauss(0.5, 0.2), 2)))
 
 		if surname != "":
 			self.name = [nameGen.first(self.gender), surname]
@@ -49,6 +49,8 @@ class Person:
 			self.name = nameGen.full(self.gender)
 
 		self.modifiers = {}	# mood modifiers
+
+		self.rapport = {}	# stores rapport with other people
 
 	def passTime(self):
 		# TODO
