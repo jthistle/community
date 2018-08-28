@@ -74,7 +74,7 @@ class Community:
 		# Show who's in the community
 		print(self)
 		# Pass time once without increasing the date
-		self.passTime()
+		self.passTime(False)
 
 	def addFamily(self, f):
 		self.families.append(f)
@@ -87,16 +87,77 @@ class Community:
 
 		return tempP
 
-	def passTime(self):
+	def passTime(self, autoDateIncrease=True):
 		# TODO
 		# Family pass time (WIP)
 		# Harsh winter, other events
 		# Social interactions
 		# People actions based on final mood and events during social interactions
 
+		if autoDateIncrease:
+			self.date += 1
+
+		# update modifiers before everything else, to prevent added modifiers from being
+		# immediately decreased in duration
+		for p in self.allPeople():
+			p.updateModifiers()
+
 		print("\n\n==== {} ====".format(self.dateToString().upper()))
+		if self.season() == 3:
+			# harsh winter
+			if random.randint(1,5) == 1: # TODO hardcoded
+				print("The winter is a harsh one")
+				self.harshWinter = True
+				for p in self.allPeople():
+					p.addModifier(12) # add 'cold' modifier
+			else:
+				self.harshWinter = False
+
 		for f in self.families:
 			f.passTime(self.date%4, self.harshWinter)
+
+		for p in self.allPeople():
+			# A person interacts with 0-10 people per day, based on extroversion
+			for i in range(math.ceil(p.getAttr("e")*10)):
+				# This next bit works by mapping by rapport. Basically,
+				# a person will be more likely to initiate social interactions
+				# with someone who they have more rapport with.
+				mappedByRapport = {}
+				totalRapport = 0
+				for i in self.allPeople():
+					if i == p:
+						continue
+
+					if i in p.rapport.keys():
+						mappedByRapport[i] = p.rapport[i]+1 # +1 to make positive
+					else:
+						mappedByRapport[i] = 1 # neutral
+					totalRapport += mappedByRapport[i]
+
+				# Choose a person to interact with randomly, but weighted by rapport
+				chosenNum = random.uniform(0, totalRapport)
+				currentNum = 0
+				for b in mappedByRapport.keys():
+					if currentNum + mappedByRapport[b] >= chosenNum:
+						# we have our person!
+						# TODO: actual interaction
+						# TODO hardcoded (loads)
+						if p.likes(b):
+							if random.randint(1,3) == 1:
+								# deep talk
+								p.updateRapport(b, 0.9)
+							else:
+								# quick chat
+								p.updateRapport(b, 0.03)
+						else:
+							p.updateRapport(b, -0.05)
+						break
+					else:
+						currentNum += mappedByRapport[b]
+
+
+	def season(self):
+		return self.date%4
 
 	def seasonToString(self, n):
 		n = n%4

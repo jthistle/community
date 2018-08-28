@@ -14,7 +14,6 @@ def main():
 
 	while True:
 		input()
-		community.date += 1
 		community.passTime()
 
 	

@@ -29,6 +29,7 @@ class Person:
 		self.parents = parents
 		self.children = []
 		self.partner = partner
+		self.alive = True
 
 		if gender != "":
 			if gender == "male":
@@ -59,7 +60,29 @@ class Person:
 		# TODO
 		# Add function to perform actions based on mood or events?
 		self.age += 1
-		self.updateModifiers()
+
+		if self.getMood() <= -1.9 and not self.isChild(): # TODO hardcoded?
+			print("{} attempted suicide".format(self.firstName()))
+			self.die() # TODO - maybe not every time
+		elif self.getMood() <= -1.5:
+			print("{} is feeling very bad".format(self.firstName()))
+		elif self.getMood() > 1.5:
+			print("{} is feeling really good".format(self.firstName()))
+		elif self.getMood() > 2:
+			print("{} is feeling euphoric".format(self.firstName()))
+		
+	def updateRapport(self, p, diff):
+		'''
+		Updates rapport with person p by diff amount
+		Rapport is a number ranging from -0.95 to 1
+		'''
+		if p in self.rapport.keys():
+			self.rapport[p] += diff
+		else:
+			self.rapport[p] = diff
+
+		# Why is -0.95 the min? So that there ALWAYS is a chance of interaction.
+		self.rapport[p] = max(-0.95, min(1, self.rapport[p]))
 
 	def calculateCap(self, b):
 		'''
@@ -89,6 +112,11 @@ class Person:
 		rom = self.calculateCap(b) * (0.5*(b.getAttr("p")-self.getAttr("p"))+1)
 		return rom
 
+	def likes(self, b):
+		if self.calculateCap(b) >= self.__capCutoff:
+			return True
+		return False
+
 	def firstName(self):
 		return self.name[0]
 	def surname(self):
@@ -100,11 +128,36 @@ class Person:
 	def regenerateFirstName(self):
 		self.name[0] = nameGen.first(self.gender)
 
+	def die(self):
+		# TODO: other things, I guess
+		self.alive = False
+		print("{} died at the age of {}".format(self.printableFullName(), self.ageToString()))
+
 	def getMood(self):
 		tempMood = self.baseMood()
 		for m in self.modifiers.keys():
 			tempMood += self.modifiers[m][1]
 		return max(-2, min(2, tempMood))
+
+	def oneWordMood(self):
+		if self.getMood() == 2:
+			return "euphoric"
+		elif self.getMood() >= 1.5:
+			return "great"
+		elif self.getMood() >= 1:
+			return "good"
+		elif self.getMood() >= 0.5:
+			return "not bad"
+		elif self.getMood() >= 0:
+			return "average"
+		elif self.getMood() >= -0.5:
+			return "a bit down"
+		elif self.getMood() >= -1:
+			return "blue"
+		elif self.getMood() >= -1.5:
+			return "bad"
+		elif self.getMood() >= -2:
+			return "suicidal"
 
 	def father(self):
 		if parents[0] == None:
@@ -127,13 +180,14 @@ class Person:
 		''' 
 		This will also overwrite any set modifier
 		'''
-		self.modifiers[moodId] = MOODS[moodId]
+		self.modifiers[moodId] = MOODS[moodId].copy() # lists are mutable, so copy
 
 	def updateModifiers(self):
 		'''
 		Decreases duration by 1 for every mood, and cleans up
 		'''
-		for mId in self.modifiers.keys():
+		tempKeys = list(self.modifiers.keys()).copy()
+		for mId in tempKeys:
 			self.modifiers[mId][2] -= 1
 			if self.modifiers[mId][2] == 0:
 				del self.modifiers[mId]
@@ -250,6 +304,8 @@ class Person:
 				for i in range(1, len(dislikes)):
 					toReturn = toReturn + " {}.".format(capitalizePreserve(dislikes[i]))
 			else:
+				# weird 'feature' where someone will dislike someone, even though no one
+				# value that should increase dislike is very high
 				toReturn = "Overall, {} dislikes {}. No reason why, he just does.".format(n1,n2)
 
 			if len(likes) > 0:
