@@ -19,8 +19,11 @@ class Person:
 	aPpearance
 	Intelligence
 	'''
+
+	# TODO hardcoded: place in config file
 	__genders = ["male", "female"]
 	__attributes = ["o", "c", "e", "a", "n", "p", "i"]
+	__capCutoff = 3
 
 	def __init__(self, parents, partner=None, gender="", age=0, surname=""):
 		self.parents = parents
@@ -69,13 +72,13 @@ class Person:
 			 0.5*(|Oa-Ob|+|Ca-Cb|)+0.1
 		'''
 
-		cap = max(0, (b.attributes["a"] \
-			+ b.attributes["a"]*max(0, (b.attributes["e"]-self.attributes["e"])) \
-			- 0.5*b.attributes["n"]*(1-self.attributes["a"]) +1
+		cap = max(0, (b.getAttr("a") \
+			+ b.getAttr("a")*max(0, (b.getAttr("e")-self.getAttr("e"))) \
+			- 0.5*b.getAttr("n")*(1-self.getAttr("a")) +1
 			))
 
-		cap = cap / (0.5*(abs(self.attributes["a"]-b.attributes["a"])+\
-			abs(self.attributes["c"]-b.attributes["c"])) +0.1)
+		cap = cap / (0.5*(abs(self.getAttr("a")-b.getAttr("a"))+\
+			abs(self.getAttr("c")-b.getAttr("c"))) +0.1)
 
 		return cap
 
@@ -83,7 +86,7 @@ class Person:
 		'''
 		Romantic interest is a function of the Cap, inflated or deflated based on appearance
 		'''
-		rom = self.calculateCap(b) * (0.5*(b.attributes["p"]-self.attributes["p"])+1)
+		rom = self.calculateCap(b) * (0.5*(b.getAttr("p")-self.getAttr("p"))+1)
 		return rom
 
 	def firstName(self):
@@ -119,7 +122,7 @@ class Person:
 			return parents[1]
 
 	def baseMood(self):
-		return self.attributes["e"] - self.attributes["n"]
+		return self.getAttr("e") - self.getAttr("n")
 	def addModifier(self, moodId):
 		''' 
 		This will also overwrite any set modifier
@@ -139,19 +142,19 @@ class Person:
 		'''
 		How prone to feeling emotions, positive or negative, a person is
 		'''
-		return 0.5*(self.attributes["e"] + self.attributes["n"])
+		return 0.5*(self.getAttr("e") + self.getAttr("n"))
 	def politicalOrientation(self):
 		'''
 		Left = 1
 		Right = 0
 		'''
-		return 0.5*(self.attributes["o"] + self.attributes["a"])
+		return 0.5*(self.getAttr("o") + self.getAttr("a"))
 	def sociopathy(self):
 		'''
 		>0.9 = Sociopath
 		>0.6 = Sociopathic tendencies
 		'''
-		return 0.5*(self.attributes["c"] - self.attributes["a"] + 1)
+		return 0.5*(self.getAttr("c") - self.getAttr("a") + 1)
 
 	def isChild(self):
 		if self.age < 16*4:
@@ -161,19 +164,118 @@ class Person:
 	def getAttr(self, letter):
 		return self.attributes[letter]
 
+	def explainCap(self, b):
+		'''
+		Explains why a cap was generated. Welcome to format hell.
+
+		~ denotes negative values should be truncated
+		Formula is, for reference:
+		(Ab + Ab*(Eb-Ea)~ - 0.5*Nb*(1-Aa))~
+		-----------------------------------
+			 0.5*(|Oa-Ob|+|Ca-Cb|)+0.1
+		'''
+		n1 = self.firstName()
+		n2 = b.firstName()
+		cap = self.calculateCap(b)
+
+		likes = []
+		dislikes = []
+		if b.getAttr("a") >= 0.8:
+			likes.append("{} is extremely friendly".format(n2))
+		elif b.getAttr("a") >= 0.5:
+			likes.append("{} is fairly friendly".format(n2))
+		elif b.getAttr("a") >= 0.2:
+			dislikes.append("{} is quite argumentative".format(n2))
+		else:
+			dislikes.append("{} is very argumentative".format(n2))
+
+		extroDiff = max(0, b.getAttr("e") - self.getAttr("e"))
+		if extroDiff >= 0.5 and b.getAttr("a") >= 0.5:
+			likes.append("{} talks so much more - and is nice when they do".format(n2))
+		elif extroDiff >= 0.5 and b.getAttr("a") < 0.5:
+			dislikes.append("{} talks so much more, but isn't very nice".format(n2))
+		elif extroDiff >= 0:
+			likes.append("{} is a bit more extroverted".format(n2))
+		elif extroDiff == 0:
+			dislikes.append("{} is quite quiet compared to {}".format(n2,n1))
+
+		neuroNegative = 0.5*b.getAttr("n")*(1-self.getAttr("a"))
+		if neuroNegative >= 0.25 and self.getAttr("a") < 0.5:
+			dislikes.append("{} is quite insecure - something that {} particularly hates".format(n2,n1))
+		elif neuroNegative >= 0.25 and self.getAttr("a") >= 0.5:
+			dislikes.append("{} is insecure enough to bother even {}".format(n2,n1))
+		elif neuroNegative >= 0 and self.getAttr("a") >= 0.5 and b.getAttr("n") >= 0.5:
+			likes.append("{} may be a bit insecure, but this doesn't really bother {}".format(n2,n1))
+		else:
+			likes.append("{} is quite secure and confident".format(n2))
+
+		openDiff = abs(self.getAttr("o")-b.getAttr("o"))
+		if openDiff < 0.1 and self.getAttr("o") >= 0.5:
+			likes.append("they are just as creative and curious as each other")
+		elif openDiff < 0.1 and self.getAttr("o") < 0.5:
+			likes.append("they are just as cautious and consistent as each other")
+		elif openDiff <= 0.25 and self.getAttr("o") >= 0.5:
+			likes.append("they share some feelings of creativity")
+		elif openDiff <= 0.25 and self.getAttr("o") >= 0.5:
+			likes.append("they share some feelings of consistency")
+		elif openDiff >= 0.75:
+			dislikes.append("{} is very different in terms of openness".format(n2))
+
+		conDiff = abs(self.getAttr("o")-b.getAttr("o"))
+		if conDiff < 0.1 and self.getAttr("o") >= 0.5:
+			likes.append("they are just as efficient and organised as each other")
+		elif conDiff < 0.1 and self.getAttr("o") < 0.5:
+			likes.append("they are just as easy-going and spontaneous as each other")
+		elif conDiff <= 0.25 and self.getAttr("o") >= 0.5:
+			likes.append("they share some feelings of efficiency")
+		elif conDiff <= 0.25 and self.getAttr("o") >= 0.5:
+			likes.append("they share some feelings of spontaneity")
+		elif conDiff >= 0.75:
+			dislikes.append("{} is very different in terms of conscientiousness".format(n2))
+
+		if cap >= self.__capCutoff:
+			toReturn = "Overall, {} likes {} because {}.".format(n1,n2,likes[0])
+			for i in range(1, len(likes)):
+				toReturn = toReturn + " {}.".format(capitalizePreserve(likes[i]))
+
+			if len(dislikes) > 0:
+				toReturn = toReturn + " {} does dislike {} slightly because {}.".format(n1,n2,dislikes[0])
+				for i in range(1, len(dislikes)):
+					toReturn = toReturn + " {}.".format(capitalizePreserve(dislikes[i]))
+
+				toReturn = toReturn + " Overall, though, {} likes {}.".format(n1,n2)
+		else:
+			if len(dislikes) > 0:
+				toReturn = "Overall, {} dislikes {} because {}.".format(n1,n2,dislikes[0])
+				for i in range(1, len(dislikes)):
+					toReturn = toReturn + " {}.".format(capitalizePreserve(dislikes[i]))
+			else:
+				toReturn = "Overall, {} dislikes {}. No reason why, he just does.".format(n1,n2)
+
+			if len(likes) > 0:
+				toReturn = toReturn + " {} does like {} slightly because {}.".format(n1,n2,likes[0])
+				for i in range(1, len(likes)):
+					toReturn = toReturn + " {}.".format(capitalizePreserve(likes[i]))
+
+				toReturn = toReturn + " Overall, though, {} dislikes {}.".format(n1,n2)
+
+		return toReturn
+
+		
+
 	def ageToString(self):
 		return "{} year(s), {} season(s)".format(self.age//4, self.age%4)
 
 	def attributesToString(self):
 		toReturn = ""
 		for attr in self.attributes.keys():
-			toReturn = toReturn+("\n{}: {}".format(attr, self.attributes[attr]))
+			toReturn = toReturn+("\n{}: {}".format(attr, self.getAttr(attr)))
 		return toReturn
 
 	def attributesAsDescription(self):
 		toReturn = []
 		for attr in self.attributes.keys():
-			val = self.attributes[attr]
+			val = self.getAttr(attr)
 			if attr == "o":
 				if val > 0.8:
 					toReturn.append("{} is very inventive and creative".format(self.firstName()))
@@ -294,3 +396,7 @@ class Person:
 		toReturn.append("")
 
 		return "\n".join(toReturn)
+
+def capitalizePreserve(s):
+	'A helper function that capitalizes the first letter, and preserves other capitals'
+	return s[0].capitalize()+s[1:]

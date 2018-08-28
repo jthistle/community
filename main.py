@@ -14,10 +14,10 @@ def main():
 
 	print(str(community))
 
-	#f1= Family()
+	'''f1= Family()
 	#community.addFamily(f1)
 
-	'''f1.generatePerson([None, None], age=80, gender="male")
+	f1.generatePerson([None, None], age=80, gender="male")
 	f1.generatePerson([None, None], age=80, gender="female")
 
 	print(str(f1))
@@ -26,9 +26,11 @@ def main():
 	print(str(f1.getPerson(1)))
 
 	print(f1.getPerson(0).calculateCap(f1.getPerson(1)))
-	print(f1.getPerson(1).calculateCap(f1.getPerson(0)))
-	print(f1.getPerson(0).calculateRomanticInterest(f1.getPerson(1)))
-	print(f1.getPerson(1).calculateRomanticInterest(f1.getPerson(0)))'''
+	print(f1.getPerson(0).explainCap(f1.getPerson(1)))
+	#print(f1.getPerson(0).calculateCap(f1.getPerson(1)))
+	#print(f1.getPerson(1).calculateCap(f1.getPerson(0)))
+	#print(f1.getPerson(0).calculateRomanticInterest(f1.getPerson(1)))
+	#print(f1.getPerson(1).calculateRomanticInterest(f1.getPerson(0)))'''
 
 if __name__ == "__main__":
 	main()
