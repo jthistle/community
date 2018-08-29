@@ -24,12 +24,22 @@ class Person:
 	__genders = ["male", "female"]
 	__attributes = ["o", "c", "e", "a", "n", "p", "i"]
 	__capCutoff = 3.5
+	__lifeExpectancy = 40
 
-	def __init__(self, parents, partner=None, gender="", age=0, surname=""):
+	def __init__(self, parents, family=None, partner=None, gender="", age=0, surname="", married=False):
 		self.parents = parents
 		self.children = []
 		self.partner = partner
+		self.age = age 				# stored in seasons
+		self.married = married
 		self.alive = True
+		self.family = family
+		self.interactionLog = []	# stores text log of interactions
+		self.modifiers = {}			# mood modifiers
+		self.rapport = {}			# stores rapport with other people
+		
+		# very fatalistic, but generates a lifetime for a person
+		self.lifetime = random.gaussian(self.__lifeExpectancy, 5) # TODO hardcoded
 
 		if gender != "":
 			if gender == "male":
@@ -39,10 +49,7 @@ class Person:
 		else:
 			self.gender = random.choice(self.__genders)
 
-		self.age = age 	# stored in seasons
-
 		self.attributes = {}
-
 		# Attributes are based on a truncated gaussian distribution
 		for attr in self.__attributes:
 			self.attributes[attr] = min(1, max(0, round(random.gauss(0.5, 0.2), 2)))
@@ -52,16 +59,21 @@ class Person:
 		else:
 			self.name = nameGen.full(self.gender)
 
-		self.modifiers = {}	# mood modifiers
-
-		self.rapport = {}	# stores rapport with other people
-
 	def passTime(self):
 		# TODO
 		# Add function to perform actions based on mood or events?
 		self.age += 1
 
-		if self.getMood() <= -1.9 and not self.isChild(): # TODO hardcoded?
+		# life expectancy is calculated by another random truncated gaussian distribution
+		if self.age > self.lifetime:
+			self.die()
+			return True
+
+		# mood level at which someone will commit suicide is a function of
+		# neuroticism. Maybe a bad idea, because base mood is also a negative
+		# function of neuroticism, but hey, might be interesting 
+		suicideLevel = min(1.9, 2 - 0.5*self.getAttr("n"))
+		if self.getMood() <= suicideLevel and not self.isChild():
 			print("{} attempted suicide".format(self.firstName()))
 			self.die() # TODO - maybe not every time
 		elif self.getMood() <= -1.5:
@@ -70,6 +82,15 @@ class Person:
 			print("{} is feeling really good".format(self.firstName()))
 		elif self.getMood() > 2:
 			print("{} is feeling euphoric".format(self.firstName()))
+
+		# Rapport decays towards 0 by 0.05 per season
+		for r in self.rapport.keys():
+			if self.rapport[r] >= 0.05:
+				self.rapport[r] -= 0.05
+			elif self.rapport[r] <= -0.05:
+				self.rapport[r] += 0.05
+			else:
+				self.rapport[r] = 0
 		
 	def updateRapport(self, p, diff):
 		'''
@@ -132,6 +153,36 @@ class Person:
 		# TODO: other things, I guess
 		self.alive = False
 		print("{} died at the age of {}".format(self.printableFullName(), self.ageToString()))
+		self.family.memberDied(self)
+
+	def rapportStatus(self, b):
+		'''
+		Returns rapport as a third-person opinion sentence
+		'''
+		n1 = self.firstName()
+		n2 = b.firstName()
+		if b in self.rapport.keys():
+			rp = self.rapport[b]
+			if rp >= 1:
+				return "{} knows {} better than anyone".format(n1, n2)
+			elif rp >= 0.8:
+				return "{} gets on great with {}".format(n1, n2)
+			elif rp >= 0.5:
+				return "{} is friends with {}".format(n1, n2)
+			elif rp >= 0.2:
+				return "{} has chatted with {}".format(n1, n2)
+			elif rp >= 0.0:
+				return "{} knows {}".format(n1, n2)
+			elif rp >= -0.2:
+				return "{} has chatted with {}".format(n1, n2)
+			elif rp >= -0.5:
+				return "{} doesn't really like {}".format(n1, n2)
+			elif rp >= -0.8:
+				return "{} hasn't got on well with {}".format(n1, n2)
+			elif rp >= -1:
+				return "{} despises {}".format(n1, n2)
+		else:
+			return "{} has never talked to {}".format(n1, n2)
 
 	def getMood(self):
 		tempMood = self.baseMood()
@@ -159,6 +210,9 @@ class Person:
 		elif self.getMood() >= -2:
 			return "suicidal"
 
+	def addChild(self, p):
+		if p not in self.children:
+			self.children.append(p)
 	def father(self):
 		if parents[0] == None:
 			return False

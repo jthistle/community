@@ -22,13 +22,14 @@ class Family:
 	def addPerson(self, p, preserveSurname=False):
 		if not preserveSurname:
 			p.setSurname(self.familyName)
+		p.family = self
 		self.people.append(p)
 
 	def generatePerson(self, parents, gender="", age=0):
 		newP = Person(parents, gender=gender, surname=self.familyName, age=age)
 		## TODO: if name is the same, add a II, if that's taken, then a III etc.
 
-		self.people.append(newP)
+		self.addPerson(newP)
 		return newP
 
 	def getPerson(self, i):
@@ -47,6 +48,25 @@ class Family:
 	def removePersonByIndex(self, i):
 		if len(self.people) > i:
 			del self.people[i]
+
+	def memberDied(self, p):
+		if p in self.people:
+			self.removePerson(p)
+			self.deadPeople.append(p)
+			# apply mood modifiers to:
+			# parents, siblings, children
+			for i in p.parents:
+				i.addModifier(8)
+			for i in p.children:
+				i.addModifier(7)
+			for i in p.parents[0].children:
+				if i != p:
+					i.addModifier(9)
+			if p.partner != None:
+				if p.married:
+					p.partner.addModifier(11)
+				else:
+					p.partner.addModifier(10)
 
 	def passTime(self, season, harshWinter):
 		# Family actions TODO

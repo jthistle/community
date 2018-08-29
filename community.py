@@ -23,7 +23,7 @@ class Community:
 			if i%2 == 0:
 				gender = "male"
 
-			tempAdults.append(Person([None, None], gender=gender, age=random.randint(20*4,40*4)))
+			tempAdults.append(Person([None, None], gender=gender, age=random.randint(20*4,40*4), married=True))
 
 		# keep track of already paired adults
 		pairedInd = []
@@ -67,6 +67,8 @@ class Community:
 			childrenCount = random.randint(0, 3)
 			for i in range(childrenCount):
 				child = tempFamily.generatePerson([a1, a2], age=random.randint(0, 12*4))
+				a1.addChild(child)
+				a2.addChild(child)
 
 			# Give enough food for the year
 			tempFamily.food = (10*2 + 6*childrenCount)*4
@@ -146,11 +148,17 @@ class Community:
 							if random.randint(1,3) == 1:
 								# deep talk
 								p.updateRapport(b, 0.9)
+								p.interactionsLog.append("I had a deep talk with {}".format(b.firstName()))
+								p.interactionsLog.append("{} had a deep talk with me".format(p.firstName()))
 							else:
 								# quick chat
 								p.updateRapport(b, 0.03)
+								p.interactionsLog.append("I had a quick chat with {}".format(b.firstName()))
+								p.interactionsLog.append("{} had a quick chat with me".format(b.firstName()))
 						else:
 							p.updateRapport(b, -0.05)
+							p.interactionsLog.append("I had an argument with {}".format(b.firstName()))
+							b.interactionsLog.append("{} had an argument with me".format(p.firstName()))
 						break
 					else:
 						currentNum += mappedByRapport[b]
