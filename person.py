@@ -24,7 +24,7 @@ class Person:
 	__genders = ["male", "female"]
 	__attributes = ["o", "c", "e", "a", "n", "p", "i"]
 	__capCutoff = 3.5
-	__lifeExpectancy = 40
+	__lifeExpectancy = 40*4
 
 	def __init__(self, parents, family=None, partner=None, gender="", age=0, surname="", married=False):
 		self.parents = parents
@@ -39,7 +39,7 @@ class Person:
 		self.rapport = {}			# stores rapport with other people
 		
 		# very fatalistic, but generates a lifetime for a person
-		self.lifetime = random.gaussian(self.__lifeExpectancy, 5) # TODO hardcoded
+		self.lifetime = random.gauss(self.__lifeExpectancy, 5*4) # TODO hardcoded
 
 		if gender != "":
 			if gender == "male":
@@ -69,10 +69,10 @@ class Person:
 			self.die()
 			return True
 
-		# mood level at which someone will commit suicide is a function of
-		# neuroticism. Maybe a bad idea, because base mood is also a negative
-		# function of neuroticism, but hey, might be interesting 
-		suicideLevel = min(1.9, 2 - 0.5*self.getAttr("n"))
+		# mood level at which someone will commit suicide is currently
+		# hardcoded. Could be a function of something in future?
+		# was previouslymin(1.9, 2 - 0.5*self.getAttr("n"))
+		suicideLevel = -1.9
 		if self.getMood() <= suicideLevel and not self.isChild():
 			print("{} attempted suicide".format(self.firstName()))
 			self.die() # TODO - maybe not every time
@@ -302,7 +302,7 @@ class Person:
 			likes.append("{} talks so much more - and is nice when they do".format(n2))
 		elif extroDiff >= 0.5 and b.getAttr("a") < 0.5:
 			dislikes.append("{} talks so much more, but isn't very nice".format(n2))
-		elif extroDiff >= 0:
+		elif extroDiff > 0:
 			likes.append("{} is a bit more extroverted".format(n2))
 		elif extroDiff == 0:
 			dislikes.append("{} is quite quiet compared to {}".format(n2,n1))
@@ -495,6 +495,21 @@ class Person:
 
 		return "\n".join(toReturn)
 
+	def getLastInteractions(self, n):
+		toReturn = []
+		for i in range(min(len(self.interactionLog), n)):
+			toReturn.append(self.interactionLog[i])
+		return "\n".join(toReturn)
+
+	def compareTo(self, b):
+		'''
+		Returns a comparison of the two people, using explainCap, and
+		rapportStatus TODO
+		'''
+		toReturn = []
+		toReturn.append("{} {}.".format(self.explainCap(b), capitalizePreserve(self.rapportStatus(b))))
+		toReturn.append("{} {}.".format(b.explainCap(self), capitalizePreserve(b.rapportStatus(self))))
+		return "\n".join(toReturn)
 
 	def __str__(self):
 		toReturn = []
@@ -503,6 +518,7 @@ class Person:
 		toReturn.append("Gender {}".format(self.gender))
 		toReturn.append("Core attributes\n {}".format(self.attributesAsDescription()))
 		toReturn.append("Other attributes\n {}".format(self.otherAttributesAsDescription()))
+		toReturn.append("Last five interactions\n {}".format(self.getLastInteractions(5)))
 		toReturn.append("")
 
 		return "\n".join(toReturn)

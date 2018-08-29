@@ -55,18 +55,25 @@ class Family:
 			self.deadPeople.append(p)
 			# apply mood modifiers to:
 			# parents, siblings, children
-			for i in p.parents:
-				i.addModifier(8)
+			if p.parents[0] != None:
+				for i in p.parents:
+					i.addModifier(8)
+					print("debug child died")
+				for i in p.parents[0].children:
+					if i != p:
+						i.addModifier(9)
+						print("debug sibling died")
+
 			for i in p.children:
 				i.addModifier(7)
-			for i in p.parents[0].children:
-				if i != p:
-					i.addModifier(9)
+				print("debug parent died")
 			if p.partner != None:
 				if p.married:
 					p.partner.addModifier(11)
+					print("debug husb/wife died")
 				else:
 					p.partner.addModifier(10)
+					print("debug partner died")
 
 	def passTime(self, season, harshWinter):
 		# Family actions TODO

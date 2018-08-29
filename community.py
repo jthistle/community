@@ -23,7 +23,7 @@ class Community:
 			if i%2 == 0:
 				gender = "male"
 
-			tempAdults.append(Person([None, None], gender=gender, age=random.randint(20*4,40*4), married=True))
+			tempAdults.append(Person([None, None], gender=gender, age=random.randint(18*4,25*4), married=True))
 
 		# keep track of already paired adults
 		pairedInd = []
@@ -81,10 +81,19 @@ class Community:
 	def addFamily(self, f):
 		self.families.append(f)
 
-	def allPeople(self):
+	def allPeople(self, minAge=0, maxAge=1000*4):
 		tempP = []
 		for f in self.families:
 			for p in f.people:
+				if p.age >= minAge and p.age <= maxAge:
+					tempP.append(p)
+
+		return tempP
+
+	def graveyard(self):
+		tempP = []
+		for f in self.families:
+			for p in f.deadPeople:
 				tempP.append(p)
 
 		return tempP
@@ -118,7 +127,7 @@ class Community:
 		for f in self.families:
 			f.passTime(self.date%4, self.harshWinter)
 
-		for p in self.allPeople():
+		for p in self.allPeople(minAge=3*4):
 			# A person interacts with 0-10 people per day, based on extroversion
 			for i in range(math.ceil(p.getAttr("e")*10)):
 				# This next bit works by mapping by rapport. Basically,
@@ -142,23 +151,29 @@ class Community:
 				for b in mappedByRapport.keys():
 					if currentNum + mappedByRapport[b] >= chosenNum:
 						# we have our person!
+						# Interactions produce rapport. The person initating the 
+						# conversation gains more rapport for that person than the
+						# person does for the initiator.
 						# TODO: actual interaction
 						# TODO hardcoded (loads)
-						if p.likes(b):
+						if p.likes(b) and b.likes(p):
 							if random.randint(1,3) == 1:
 								# deep talk
 								p.updateRapport(b, 0.9)
-								p.interactionsLog.append("I had a deep talk with {}".format(b.firstName()))
-								p.interactionsLog.append("{} had a deep talk with me".format(p.firstName()))
+								b.updateRapport(p, 0.6)
+								p.interactionLog.append("I had a deep talk with {}".format(b.printableFullName()))
+								b.interactionLog.append("{} had a deep talk with me".format(p.printableFullName()))
 							else:
 								# quick chat
 								p.updateRapport(b, 0.03)
-								p.interactionsLog.append("I had a quick chat with {}".format(b.firstName()))
-								p.interactionsLog.append("{} had a quick chat with me".format(b.firstName()))
+								b.updateRapport(p, 0.02)
+								p.interactionLog.append("I had a quick chat with {}".format(b.printableFullName()))
+								b.interactionLog.append("{} had a quick chat with me".format(p.printableFullName()))
 						else:
 							p.updateRapport(b, -0.05)
-							p.interactionsLog.append("I had an argument with {}".format(b.firstName()))
-							b.interactionsLog.append("{} had an argument with me".format(p.firstName()))
+							b.updateRapport(p, -0.05)
+							p.interactionLog.append("I had an argument with {}".format(b.printableFullName()))
+							b.interactionLog.append("{} had an argument with me".format(p.printableFullName()))
 						break
 					else:
 						currentNum += mappedByRapport[b]
