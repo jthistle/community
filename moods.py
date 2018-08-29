@@ -12,7 +12,7 @@ MOODS = {
 	8: 	["Child died", 			-0.6, 	4],
 	9: 	["Sibling died", 		-0.6, 	3],
 	10:	["Partner died",		-0.5, 	3],
-	11:	["Husband/wife died", 	-0.6, 	6],
+	11:	["Husband/wife died", 	-0.8, 	5],
 	12: ["Cold", 				-0.1, 	1],
 	13: ["Good harvest", 		0.2, 	2],
 	14: ["Made a profit", 		0.2, 	1],
