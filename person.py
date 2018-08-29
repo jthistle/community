@@ -360,7 +360,7 @@ class Person:
 			else:
 				# weird 'feature' where someone will dislike someone, even though no one
 				# value that should increase dislike is very high
-				toReturn = "Overall, {} dislikes {}. No reason why, he just does.".format(n1,n2)
+				toReturn = "Overall, {} dislikes {}. No reason why, they just do.".format(n1,n2)
 
 			if len(likes) > 0:
 				toReturn = toReturn + " {} does like {} slightly because {}.".format(n1,n2,likes[0])
