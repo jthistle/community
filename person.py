@@ -184,6 +184,29 @@ class Person:
 		else:
 			return "{} has never talked to {}".format(n1, n2)
 
+	def friends(self):
+		bestFriends = []
+		friends = []
+		for p in self.rapport.keys():
+			if self.rapport[p] >= 0.8:
+				bestFriends.append(p)
+			elif self.rapport[p] >= 0.5:
+				friends.append(p)
+
+		toReturn = []
+		if len(bestFriends) > 0:
+			toReturn.append("{} is best friends with: ".format(self.firstName()))
+			toReturn = toReturn + [x.printableFullName() for x in bestFriends]
+		else:
+			toReturn.append("{} has no best friends".format(self.firstName()))
+		if len(friends) > 0:
+			toReturn.append("{} is friends with: ".format(self.firstName()))
+			toReturn = toReturn + [x.printableFullName() for x in friends]
+		else:
+			toReturn.append("{} has no friends".format(self.firstName()))
+
+		return "\n".join(toReturn)
+
 	def getMood(self):
 		tempMood = self.baseMood()
 		for m in self.modifiers.keys():
@@ -513,12 +536,13 @@ class Person:
 
 	def __str__(self):
 		toReturn = []
-		toReturn.append("{} {}".format(self.name[0], self.name[1]))
-		toReturn.append("Aged {}".format(self.ageToString()))
-		toReturn.append("Gender {}".format(self.gender))
-		toReturn.append("Core attributes\n {}".format(self.attributesAsDescription()))
-		toReturn.append("Other attributes\n {}".format(self.otherAttributesAsDescription()))
-		toReturn.append("Last five interactions\n {}".format(self.getLastInteractions(5)))
+		toReturn.append("=== {} {}".format(self.name[0], self.name[1]))
+		toReturn.append("=== Aged {}".format(self.ageToString()))
+		toReturn.append("=== Gender {}".format(self.gender))
+		toReturn.append("=== Core attributes\n{}".format(self.attributesAsDescription()))
+		toReturn.append("=== Other attributes\n{}".format(self.otherAttributesAsDescription()))
+		toReturn.append("=== Last five interactions\n{}".format(self.getLastInteractions(5)))
+		toReturn.append("=== Friends\n{}".format(self.friends()))
 		toReturn.append("")
 
 		return "\n".join(toReturn)

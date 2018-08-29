@@ -7,7 +7,7 @@ from moods import MOODS
 
 class Community:
 	'Base community class'
-	__baseYear = 1043
+	__baseYear = 1443
 
 	def __init__(self):
 		self.families = []
@@ -154,13 +154,12 @@ class Community:
 						# Interactions produce rapport. The person initating the 
 						# conversation gains more rapport for that person than the
 						# person does for the initiator.
-						# TODO: actual interaction
 						# TODO hardcoded (loads)
 						if p.likes(b) and b.likes(p):
 							if random.randint(1,3) == 1:
 								# deep talk
-								p.updateRapport(b, 0.9)
-								b.updateRapport(p, 0.6)
+								p.updateRapport(b, 0.09)
+								b.updateRapport(p, 0.06)
 								p.interactionLog.append("I had a deep talk with {}".format(b.printableFullName()))
 								b.interactionLog.append("{} had a deep talk with me".format(p.printableFullName()))
 							else:
