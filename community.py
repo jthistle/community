@@ -13,6 +13,7 @@ class Community:
 		self.families = []
 		self.date = 0 # SET TO 0 IF NOT
 		self.harshWinter = False
+		self.eventLog = []
 
 		# generate 3 families, each with 2 adults and randomly 0-3 children
 		# Do this by generating 6 adults (aged 20-40) and matching them based on romantic interest
@@ -81,6 +82,11 @@ class Community:
 	def addFamily(self, f):
 		self.families.append(f)
 
+	def getFamilyByIndex(self, i):
+		if i < len(self.families):
+			return self.families[i]
+		return False
+
 	def allPeople(self, minAge=0, maxAge=1000*4):
 		tempP = []
 		for f in self.families:
@@ -117,7 +123,7 @@ class Community:
 		if self.season() == 3:
 			# harsh winter
 			if random.randint(1,5) == 1: # TODO hardcoded
-				print("The winter is a harsh one")
+				self.log("The winter is a harsh one")
 				self.harshWinter = True
 				for p in self.allPeople():
 					p.addModifier(12) # add 'cold' modifier
@@ -177,6 +183,8 @@ class Community:
 					else:
 						currentNum += mappedByRapport[b]
 
+	def log(self, s):
+		self.eventLog.append(s)
 
 	def season(self):
 		return self.date%4
