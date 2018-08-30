@@ -1,7 +1,9 @@
 language: python
 python:
   - "3.6"
+before_install:
+  - sudo apt-get install -y python3.6-tk
 install:
-  - ./travis/install.sh
+  - pip install names
 script:
   - ./tests.py
