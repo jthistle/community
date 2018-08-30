@@ -8,8 +8,12 @@ class Tests:
 	def __init__(self):
 		None
 
+	def placeholder(self):
+		print("hello world!")
+		return True
+
 	def runCapTests(self):
-		f1 = Family()
+		f1 = Family(None)
 		with open("data.csv", "w", newline="") as csvFile:
 			writer = csv.writer(csvFile)
 			writer.writerow(["Cap"])
@@ -26,7 +30,7 @@ class Tests:
 				f1.removePersonByIndex(0)
 
 	def runRomTests(self):
-		f1 = Family()
+		f1 = Family(None)
 		with open("data.csv", "w", newline="") as csvFile:
 			writer = csv.writer(csvFile)
 			writer.writerow(["Rom"])
@@ -64,3 +68,7 @@ class Tests:
 
 				f1.removePersonByIndex(1)
 				f1.removePersonByIndex(0)
+
+if __name__ == "__main__":
+	t = Tests()
+	t.placeholder()
