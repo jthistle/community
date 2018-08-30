@@ -5,7 +5,7 @@ MOODS = {
 	1: 	["Hungry", 				-0.1,	1],
 	2: 	["Malnourished",		-0.3, 	1],
 	3: 	["Starving", 			-0.7, 	1],
-	4: 	["New partner", 		0.4, 	2], 
+	4: 	["New partner", 		0.4, 	2],
 	5: 	["Got married", 		0.8, 	2],
 	6: 	["Broke up", 			-0.3, 	2],
 	7: 	["Parent died", 		-0.5, 	3],

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 from tkinter import *
-import random, math, sys
+import random
+import math
+import sys
 from person import Person
 from family import Family
 from community import Community
 from tests import Tests
+
 
 def takeMenuInput(min, max):
 	'Min - max is inclusive'
@@ -20,8 +23,10 @@ def takeMenuInput(min, max):
 				print("Must be a number")
 	return choice
 
+
 def endProgram():
 	sys.exit()
+
 
 class Application(Frame):
 	def __init__(self, master=None):
@@ -83,7 +88,7 @@ class Application(Frame):
 		self.personInfoLabel.grid(row=0, column=2, sticky=W)
 		self.personInfo = Frame(self.restFrame, borderwidth=2, relief=GROOVE)
 		self.personInfo.grid(row=1, column=2, rowspan=3, sticky=N+E+W+S, padx=5)
-		self.personInfoText = Label(self.personInfo, text="",anchor=W, justify=LEFT)
+		self.personInfoText = Label(self.personInfo, text="", anchor=W, justify=LEFT)
 		self.personInfoText.config(wraplength=350)
 		self.personInfoText.pack(fill=X)
 		self.personEvents = Text(self.personInfo, height=10, state=DISABLED)
@@ -112,7 +117,7 @@ class Application(Frame):
 			else:
 				self.personInfoText.config(text="Select a family to begin")
 		elif self.viewMode == "compare":
-			if self.comparePerson == None:
+			if self.comparePerson is None:
 				self.writeToInspector("Select a person to compare")
 
 		if self.viewMode == "inspect":
@@ -124,7 +129,7 @@ class Application(Frame):
 
 	def updatePeopleList(self):
 		self.peopleList.delete(0, END)
-		if self.selectedFamily != None:
+		if self.selectedFamily is not None:
 			f = self.community.getFamilyByIndex(self.selectedFamily)
 			for p in f.people:
 				self.peopleList.insert(END, p.firstName())
@@ -137,13 +142,13 @@ class Application(Frame):
 
 	def inspectPerson(self):
 		self.lastInspected = "person"
-		if self.selectedPerson != None:
+		if self.selectedPerson is not None:
 			p = self.getSelectedPerson()
 			self.writeToInspector(p.inspect())
 			self.writeInspectorEvents(p.eventLog)
 
 	def comparePeople(self):
-		## TODO compare
+		# TODO compare
 		p1 = self.comparePerson
 		p2 = self.getSelectedPerson()
 		self.writeToInspector(p1.compareTo(p2))
@@ -183,11 +188,11 @@ class Application(Frame):
 		self.updateWidgets()
 
 	def onCompareBtnClick(self, evt):
-		if self.selectedPerson != None and self.lastInspected == "person":
+		if self.selectedPerson is not None and self.lastInspected == "person":
 			self.viewMode = "compare"
 			self.comparePerson = self.getSelectedPerson()
 			self.writeToInspector("Select a person to compare to {}".format(self.comparePerson.firstName()))
-			self.writeInspectorEvents([]) # clear events panel
+			self.writeInspectorEvents([])  # clear events panel
 		self.updateWidgets()
 
 	def writeToInspector(self, s):
@@ -214,9 +219,10 @@ class Application(Frame):
 		'Placeholder function'
 		None
 
+
 if __name__ == "__main__":
 	root = Tk()
 	root.geometry("800x500")
-	root.resizable(0,0)
+	root.resizable(0, 0)
 	app = Application(master=root)
 	app.mainloop()

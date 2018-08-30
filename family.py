@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-import random, math
+import random
+import math
 from namegen import NameGen
 from person import Person
 from config import *
 
 nameGen = NameGen()
+
 
 class Family:
 	'Base family class'
@@ -28,7 +30,7 @@ class Family:
 
 	def generatePerson(self, parents, gender="", age=0):
 		newP = Person(parents, gender=gender, surname=self.familyName, age=age)
-		## TODO: if name is the same, add a II, if that's taken, then a III etc.
+		# TODO: if name is the same, add a II, if that's taken, then a III etc.
 
 		self.addPerson(newP)
 		return newP
@@ -36,7 +38,7 @@ class Family:
 	def getPerson(self, i):
 		try:
 			return self.people[i]
-		except:
+		except Exception as e:
 			return False
 
 	def removePerson(self, p):
@@ -60,7 +62,7 @@ class Family:
 
 			# apply mood modifiers to:
 			# parents, siblings, children
-			if p.parents[0] != None:
+			if p.parents[0] is not None:
 				for i in p.parents:
 					i.addModifier(8)
 					print("debug child died")
@@ -72,7 +74,7 @@ class Family:
 			for i in p.children:
 				i.addModifier(7)
 				print("debug parent died")
-			if p.partner != None:
+			if p.partner is not None:
 				if p.married:
 					p.partner.addModifier(11)
 					print("debug husb/wife died")
@@ -150,7 +152,7 @@ class Family:
 			# and is slightly random.
 			# Only adults can work as a merchant.
 
-			startFood = self.food # used to calculate profit
+			startFood = self.food  # used to calculate profit
 
 			baseIncome = MERCHANT_BASE_INCOME
 			incomeModifier = min(1.5, max(0.5, random.gauss(1, 0.2)))
@@ -164,12 +166,12 @@ class Family:
 		# Calculate food shares
 		# Prioritise child food
 		childFood = 0
-		adultFood = 0 
+		adultFood = 0
 
 		if children > 0:
 			childFood = min(CHILD_FOOD_NOURISHED, self.food // children)
 			self.food -= childFood * children
-		if adults > 0: # should always be true
+		if adults > 0:  # should always be true
 			adultFood = min(ADULT_FOOD_NOURISHED, self.food // adults)
 			self.food -= adultFood * adults
 
@@ -209,7 +211,6 @@ class Family:
 				self.log("The family is sowing the fields")
 			elif season == 3:
 				self.log("The remains of the harvest wither and die in the cold")
-
 
 		for p in self.people:
 			if goodHarvest:

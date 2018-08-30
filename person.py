@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-import random, math
+import random
+import math
 from namegen import NameGen
 from moods import MOODS
 from config import *
 
 nameGen = NameGen()
+
 
 class Person:
 	'''
@@ -37,7 +39,7 @@ class Person:
 		self.eventLog = []			# stores text log of interactions
 		self.modifiers = {}			# mood modifiers
 		self.rapport = {}			# stores rapport with other people
-		
+
 		# very fatalistic, but generates a lifetime for a person
 		self.lifetime = random.gauss(self.__lifeExpectancy, LIFE_EXPECTANCY_SD)
 
@@ -73,7 +75,7 @@ class Person:
 		suicideLevel = SUICIDE_MIN_MOOD_LEVEL
 		if self.getMood() <= suicideLevel and not self.isChild():
 			print("{} attempted suicide".format(self.firstName()))
-			self.die() # TODO - maybe not every time
+			self.die()  # TODO - maybe not every time
 		elif self.getMood() <= -1.5:
 			print("feeling very bad".format(self.firstName()))
 		elif self.getMood() > 1.5:
@@ -89,7 +91,7 @@ class Person:
 				self.rapport[r] += RAPPORT_DECAY
 			else:
 				self.rapport[r] = 0
-		
+
 	def updateRapport(self, p, diff):
 		'''
 		Updates rapport with person p by diff amount
@@ -111,16 +113,15 @@ class Person:
 		Formula is:
 		(Ab + Ab*(Eb-Ea)~ - 0.5*Nb*(1-Aa))~
 		-----------------------------------
-			 0.5*(|Oa-Ob|+|Ca-Cb|)+0.1
+			0.5*(|Oa-Ob|+|Ca-Cb|)+0.1
 		'''
 
-		cap = max(0, (b.getAttr("a") \
-			+ b.getAttr("a")*max(0, (b.getAttr("e")-self.getAttr("e"))) \
-			- 0.5*b.getAttr("n")*(1-self.getAttr("a")) +1
-			))
+		cap = max(0, (b.getAttr("a") +
+			b.getAttr("a")*max(0, (b.getAttr("e")-self.getAttr("e"))) -
+			0.5*b.getAttr("n")*(1-self.getAttr("a"))+1))
 
-		cap = cap / (0.5*(abs(self.getAttr("a")-b.getAttr("a"))+\
-			abs(self.getAttr("c")-b.getAttr("c"))) +0.1)
+		cap = cap / (0.5*(abs(self.getAttr("a")-b.getAttr("a")) +
+			abs(self.getAttr("c")-b.getAttr("c")))+0.1)
 
 		return cap
 
@@ -138,12 +139,16 @@ class Person:
 
 	def firstName(self):
 		return self.name[0]
+
 	def surname(self):
 		return self.name[1]
+
 	def printableFullName(self):
 		return "{} {}".format(self.name[0], self.name[1])
+
 	def setSurname(self, s):
 		self.name[1] = s
+
 	def regenerateFirstName(self):
 		self.name[0] = nameGen.first(self.gender)
 
@@ -233,15 +238,17 @@ class Person:
 	def addChild(self, p):
 		if p not in self.children:
 			self.children.append(p)
+
 	def father(self):
-		if parents[0] == None:
+		if parents[0] is None:
 			return False
 		elif parents[0].gender == "male":
 			return parents[0]
 		else:
 			return parents[1]
+
 	def mother(self):
-		if parents[0] == None:
+		if parents[0] is None:
 			return False
 		elif parents[0].gender == "female":
 			return parents[0]
@@ -250,11 +257,12 @@ class Person:
 
 	def baseMood(self):
 		return self.getAttr("e") - self.getAttr("n")
+
 	def addModifier(self, moodId):
-		''' 
+		'''
 		This will also overwrite any set modifier
 		'''
-		self.modifiers[moodId] = MOODS[moodId].copy() # lists are mutable, so copy
+		self.modifiers[moodId] = MOODS[moodId].copy()  # lists are mutable, so copy
 
 	def updateModifiers(self):
 		'''
@@ -271,12 +279,14 @@ class Person:
 		How prone to feeling emotions, positive or negative, a person is
 		'''
 		return 0.5*(self.getAttr("e") + self.getAttr("n"))
+
 	def politicalOrientation(self):
 		'''
 		Left = 1
 		Right = 0
 		'''
 		return 0.5*(self.getAttr("o") + self.getAttr("a"))
+
 	def sociopathy(self):
 		'''
 		>0.9 = Sociopath
@@ -300,7 +310,7 @@ class Person:
 		Formula is, for reference:
 		(Ab + Ab*(Eb-Ea)~ - 0.5*Nb*(1-Aa))~
 		-----------------------------------
-			 0.5*(|Oa-Ob|+|Ca-Cb|)+0.1
+			0.5*(|Oa-Ob|+|Ca-Cb|)+0.1
 		'''
 		n1 = self.firstName()
 		n2 = b.firstName()
@@ -325,15 +335,15 @@ class Person:
 		elif extroDiff > 0:
 			likes.append("{} is a bit more extroverted".format(n2))
 		elif extroDiff == 0:
-			dislikes.append("{} is quite quiet compared to {}".format(n2,n1))
+			dislikes.append("{} is quite quiet compared to {}".format(n2, n1))
 
 		neuroNegative = 0.5*b.getAttr("n")*(1-self.getAttr("a"))
 		if neuroNegative >= 0.25 and self.getAttr("a") < 0.5:
-			dislikes.append("{} is quite insecure - something that {} particularly hates".format(n2,n1))
+			dislikes.append("{} is quite insecure - something that {} particularly hates".format(n2, n1))
 		elif neuroNegative >= 0.25 and self.getAttr("a") >= 0.5:
-			dislikes.append("{} is insecure enough to bother even {}".format(n2,n1))
+			dislikes.append("{} is insecure enough to bother even {}".format(n2, n1))
 		elif neuroNegative >= 0 and self.getAttr("a") >= 0.5 and b.getAttr("n") >= 0.5:
-			likes.append("{} may be a bit insecure, but this doesn't really bother {}".format(n2,n1))
+			likes.append("{} may be a bit insecure, but this doesn't really bother {}".format(n2, n1))
 		else:
 			likes.append("{} is quite secure and confident".format(n2))
 
@@ -362,36 +372,34 @@ class Person:
 			dislikes.append("{} is very different in terms of conscientiousness".format(n2))
 
 		if cap >= self.__capCutoff:
-			toReturn = "Overall, {} likes {} because {}.".format(n1,n2,likes[0])
+			toReturn = "Overall, {} likes {} because {}.".format(n1, n2, likes[0])
 			for i in range(1, len(likes)):
 				toReturn = toReturn + " {}.".format(capitalizePreserve(likes[i]))
 
 			if len(dislikes) > 0:
-				toReturn = toReturn + " {} does dislike {} slightly because {}.".format(n1,n2,dislikes[0])
+				toReturn = toReturn + " {} does dislike {} slightly because {}.".format(n1, n2, dislikes[0])
 				for i in range(1, len(dislikes)):
 					toReturn = toReturn + " {}.".format(capitalizePreserve(dislikes[i]))
 
-				toReturn = toReturn + " Overall, though, {} likes {}.".format(n1,n2)
+				toReturn = toReturn + " Overall, though, {} likes {}.".format(n1, n2)
 		else:
 			if len(dislikes) > 0:
-				toReturn = "Overall, {} dislikes {} because {}.".format(n1,n2,dislikes[0])
+				toReturn = "Overall, {} dislikes {} because {}.".format(n1, n2, dislikes[0])
 				for i in range(1, len(dislikes)):
 					toReturn = toReturn + " {}.".format(capitalizePreserve(dislikes[i]))
 			else:
 				# weird 'feature' where someone will dislike someone, even though no one
 				# value that should increase dislike is very high
-				toReturn = "Overall, {} dislikes {}. No reason why, they just do.".format(n1,n2)
+				toReturn = "Overall, {} dislikes {}. No reason why, they just do.".format(n1, n2)
 
 			if len(likes) > 0:
-				toReturn = toReturn + " {} does like {} slightly because {}.".format(n1,n2,likes[0])
+				toReturn = toReturn + " {} does like {} slightly because {}.".format(n1, n2, likes[0])
 				for i in range(1, len(likes)):
 					toReturn = toReturn + " {}.".format(capitalizePreserve(likes[i]))
 
-				toReturn = toReturn + " Overall, though, {} dislikes {}.".format(n1,n2)
+				toReturn = toReturn + " Overall, though, {} dislikes {}.".format(n1, n2)
 
 		return toReturn
-
-		
 
 	def ageToString(self):
 		return "{} year(s), {} season(s)".format(self.age//4, self.age%4)
@@ -470,8 +478,8 @@ class Person:
 				else:
 					toReturn.append("not intelligent")
 
-		strToReturn = "{} is {} and {}.".format(self.firstName(), ", ".join(toReturn[:len(toReturn)-1]),\
-		 toReturn[len(toReturn)-1])
+		strToReturn = "{} is {} and {}.".format(self.firstName(), ", ".join(toReturn[:len(toReturn)-1]),
+			toReturn[len(toReturn)-1])
 		return strToReturn
 
 	def otherAttributesAsDescription(self):
@@ -515,8 +523,8 @@ class Person:
 		else:
 			toReturn.append("very pessimistic")
 
-		strToReturn = "{} is also {} and {}.".format(self.firstName(), ", ".join(toReturn[:len(toReturn)-1]),\
-		 toReturn[len(toReturn)-1])
+		strToReturn = "{} is also {} and {}.".format(self.firstName(), ", ".join(toReturn[:len(toReturn)-1]),
+			toReturn[len(toReturn)-1])
 
 		return strToReturn
 
@@ -564,6 +572,7 @@ class Person:
 		toReturn.append("")
 
 		return "\n".join(toReturn)
+
 
 def capitalizePreserve(s):
 	'A helper function that capitalizes the first letter, and preserves other capitals'

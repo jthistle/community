@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+pycodestyle .
 if [[ $(pycodestyle .) ]]; then
 	echo "FAIL: see above"
 	exit 1
