@@ -4,6 +4,7 @@ python:
 before_install:
   - sudo apt-get install -y python3-tk
 install:
-  - pip install names
+  - pip install names pycodestyle
 script:
   - ./tests.py
+  - ./linter.sh
