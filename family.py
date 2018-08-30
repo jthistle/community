@@ -11,13 +11,14 @@ class Family:
 	 # change according to probability
 	__professions = ["farmer"]*2 + ["merchant"]
 
-	def __init__(self):
+	def __init__(self, community):
 		self.people = []
 		self.deadPeople = []
 		self.familyName = nameGen.last()
 		self.food = 0
 		self.profession = random.choice(self.__professions)
 		self.eventLog = []
+		self.community = community
 
 	def addPerson(self, p, preserveSurname=False):
 		if not preserveSurname:
@@ -53,7 +54,9 @@ class Family:
 		if p in self.people:
 			self.removePerson(p)
 			self.deadPeople.append(p)
-			self.log("{} died at the age of {}".format(p.printableFullName(), p.ageToString()))
+			toLog = "{} died at the age of {}".format(p.printableFullName(), p.ageToString())
+			self.log(toLog)
+			self.community.log(toLog)
 
 			# apply mood modifiers to:
 			# parents, siblings, children

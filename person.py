@@ -168,7 +168,7 @@ class Person:
 			elif rp >= 0.8:
 				return "{} gets on great with {}".format(n1, n2)
 			elif rp >= 0.5:
-				return "friends with {}".format(n1, n2)
+				return "{} is friends with {}".format(n1, n2)
 			elif rp >= 0.2:
 				return "{} has chatted with {}".format(n1, n2)
 			elif rp >= 0.0:

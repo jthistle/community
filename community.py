@@ -58,8 +58,11 @@ class Community:
 			a1.partner = a2
 			a2.partner = a1
 
+			a1.updateRapport(a2, 0.7)
+			a2.updateRapport(a1, 0.7)
+
 			# Create a family for these adults
-			tempFamily = Family()
+			tempFamily = Family(self)
 			self.families.append(tempFamily)
 			tempFamily.addPerson(a1)
 			tempFamily.addPerson(a2)
@@ -70,6 +73,11 @@ class Community:
 				child = tempFamily.generatePerson([a1, a2], age=random.randint(0, 12*4))
 				a1.addChild(child)
 				a2.addChild(child)
+				# Make sure to set a base rapport
+				a1.updateRapport(child, 0.7)
+				a2.updateRapport(child, 0.7)
+				child.updateRapport(a1, 0.7)
+				child.updateRapport(a2, 0.7)
 
 			# Give enough food for the year
 			tempFamily.food = (10*2 + 6*childrenCount)*4
@@ -106,7 +114,7 @@ class Community:
 
 	def passTime(self, autoDateIncrease=True):
 		# TODO
-		# Family pass time (WIP)
+		# Family pass time
 		# Harsh winter, other events
 		# Social interactions
 		# People actions based on final mood and events during social interactions
@@ -149,6 +157,17 @@ class Community:
 						mappedByRapport[i] = p.rapport[i]+1 # +1 to make positive
 					else:
 						mappedByRapport[i] = 1 # neutral
+
+					# Younger people will want to talk to people of their own age.
+					# So, decrease the mapping by a number based on age.
+					# How doesn the formula work? Black magic and duct tape.
+					# Of course, this doesn't apply to family.
+					# This assumes that there is no age prejudice above 16 - TODO?
+					if i not in p.family.people:
+						addition = max(0, \
+							(16 - abs(i.age//4-p.age//4)) * max(0, (16*4/(16*4-p.age))) )
+						mappedByRapport[i] = max(0, mappedByRapport[i] + addition)
+
 					totalRapport += mappedByRapport[i]
 
 				# Choose a person to interact with randomly, but weighted by rapport
@@ -162,7 +181,7 @@ class Community:
 						# person does for the initiator.
 						# TODO hardcoded (loads)
 						if p.likes(b) and b.likes(p):
-							if random.randint(1,3) == 1:
+							if random.randint(1,3) == 1 and p.age > 8*4 and b.age > 8*4:
 								# deep talk
 								p.updateRapport(b, 0.09)
 								b.updateRapport(p, 0.06)
@@ -175,10 +194,16 @@ class Community:
 								p.log("I had a quick chat with {}".format(b.printableFullName()))
 								b.log("{} had a quick chat with me".format(p.printableFullName()))
 						else:
-							p.updateRapport(b, -0.05)
-							b.updateRapport(p, -0.05)
-							p.log("I had an argument with {}".format(b.printableFullName()))
-							b.log("{} had an argument with me".format(p.printableFullName()))
+							if b.age > 8*4 and p.age > 8*4:
+								p.updateRapport(b, -0.05)
+								b.updateRapport(p, -0.05)
+								p.log("I had an argument with {}".format(b.printableFullName()))
+								b.log("{} had an argument with me".format(p.printableFullName()))
+							else:
+								p.updateRapport(b, -0.05)
+								b.updateRapport(p, -0.05)
+								p.log("I gave {} an angry look".format(b.printableFullName()))
+								b.log("{} gave me an angry look".format(p.printableFullName()))
 						break
 					else:
 						currentNum += mappedByRapport[b]
