@@ -2,6 +2,7 @@
 
 import names
 
+
 class NameGen():
 	def __init__(self):
 		None
@@ -14,6 +15,6 @@ class NameGen():
 			return names.get_first_name(gender="male")
 		else:
 			return names.get_first_name(gender="female")
-			
+
 	def last(self):
 		return names.get_last_name()

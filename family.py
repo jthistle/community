@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
-import random, math
+import random
+import math
 from namegen import NameGen
 from person import Person
+from config import *
 
 nameGen = NameGen()
 
+
 class Family:
 	'Base family class'
-	 # change according to probability
-	__professions = ["farmer"]*2 + ["merchant"]
+	__professions = PROFESSIONS
 
 	def __init__(self, community):
 		self.people = []
@@ -28,7 +30,7 @@ class Family:
 
 	def generatePerson(self, parents, gender="", age=0):
 		newP = Person(parents, gender=gender, surname=self.familyName, age=age)
-		## TODO: if name is the same, add a II, if that's taken, then a III etc.
+		# TODO: if name is the same, add a II, if that's taken, then a III etc.
 
 		self.addPerson(newP)
 		return newP
@@ -36,7 +38,7 @@ class Family:
 	def getPerson(self, i):
 		try:
 			return self.people[i]
-		except:
+		except Exception as e:
 			return False
 
 	def removePerson(self, p):
@@ -60,7 +62,7 @@ class Family:
 
 			# apply mood modifiers to:
 			# parents, siblings, children
-			if p.parents[0] != None:
+			if p.parents[0] is not None:
 				for i in p.parents:
 					i.addModifier(8)
 					print("debug child died")
@@ -72,7 +74,7 @@ class Family:
 			for i in p.children:
 				i.addModifier(7)
 				print("debug parent died")
-			if p.partner != None:
+			if p.partner is not None:
 				if p.married:
 					p.partner.addModifier(11)
 					print("debug husb/wife died")
@@ -110,7 +112,7 @@ class Family:
 		for p in self.people:
 			if p.isChild():
 				children += 1
-				if p.age > 8*4: # TODO hardcoded
+				if p.age > WORKING_CHILD_MIN_AGE:
 					workingChildren += 1
 			else:
 				adults += 1
@@ -133,7 +135,7 @@ class Family:
 			if season == 2:
 				yieldModifier = min(1.2, max(0.8, random.gauss(1, 0.1)))
 				if harshWinter:
-					yieldModifier *= 0.5 # TODO hardcoded
+					yieldModifier *= HARSH_WINTER_MOD
 					self.log("The harsh winter has reduced yields")
 
 				if yieldModifier >= 1:
@@ -141,8 +143,8 @@ class Family:
 					self.log("It has been a good harvest for the {} family".format(self.familyName))
 
 				startFood = self.food
-				self.food += 50*yieldModifier*adults # TODO hardcoded
-				self.food += 25*yieldModifier*workingChildren # and here
+				self.food += ADULT_BASE_HARVEST*yieldModifier*adults
+				self.food += CHILD_BASE_HARVEST*yieldModifier*workingChildren
 				self.food = round(self.food)
 				self.log("The family harvested {} units of food".format(self.food-startFood))
 		elif self.profession == "merchant":
@@ -150,9 +152,9 @@ class Family:
 			# and is slightly random.
 			# Only adults can work as a merchant.
 
-			startFood = self.food # used to calculate profit
+			startFood = self.food  # used to calculate profit
 
-			baseIncome = 15 # TODO hardcoded
+			baseIncome = MERCHANT_BASE_INCOME
 			incomeModifier = min(1.5, max(0.5, random.gauss(1, 0.2)))
 			for p in self.people:
 				if p.isChild():
@@ -163,39 +165,34 @@ class Family:
 
 		# Calculate food shares
 		# Prioritise child food
-		# TODO hardcoded - A lot of these values are hardcoded
-		# and should really be stored in a config file somewhere.
 		childFood = 0
-		adultFood = 0 
+		adultFood = 0
 
 		if children > 0:
-			childFood = min(6, self.food // children)
+			childFood = min(CHILD_FOOD_NOURISHED, self.food // children)
 			self.food -= childFood * children
-		if adults > 0: # should always be true
-			adultFood = min(10, self.food // adults)
+		if adults > 0:  # should always be true
+			adultFood = min(ADULT_FOOD_NOURISHED, self.food // adults)
 			self.food -= adultFood * adults
 
-		# print("Debug: childFood = {}   adultFood = {}".format(childFood, adultFood))
-
-		# TODO hardcoded - loads of values here
 		for p in self.people:
 			if p.isChild():
-				if childFood == 6:
+				if childFood == CHILD_FOOD_NOURISHED:
 					p.addModifier(0)
-				elif childFood > 4:
+				elif childFood > CHILD_FOOD_HUNGRY:
 					p.addModifier(1)
-				elif childFood > 2:
+				elif childFood > CHILD_FOOD_MALNOURISHED:
 					p.addModifier(2)
 					self.log("{} is malnourised".format(p.firstName()))
 				else:
 					p.addModifier(3)
 					self.log("{} is starving".format(p.firstName()))
 			else:
-				if adultFood == 10:
+				if adultFood == ADULT_FOOD_NOURISHED:
 					p.addModifier(0)
-				elif childFood > 7:
+				elif childFood > ADULT_FOOD_HUNGRY:
 					p.addModifier(1)
-				elif childFood > 4:
+				elif childFood > ADULT_FOOD_MALNOURISHED:
 					p.addModifier(2)
 					self.log("{} is malnourished".format(p.firstName()))
 				else:
@@ -215,16 +212,16 @@ class Family:
 			elif season == 3:
 				self.log("The remains of the harvest wither and die in the cold")
 
-
 		for p in self.people:
 			if goodHarvest:
 				p.addModifier(13)
 			if madeProfit:
 				p.addModifier(14)
 
-		if self.food > len(self.people)*100:
-			self.food = len(self.people)*100
+		if self.food > len(self.people)*MAX_FOOD_STORAGE_PER_PERSON:
+			self.food = len(self.people)*MAX_FOOD_STORAGE_PER_PERSON
 			self.log("The family struggles to store so much food, and some of it perishes")
+
 		self.log("The family ends the season with {} units of food".format(self.food))
 
 	def inspect(self):

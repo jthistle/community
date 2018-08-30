@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-import random, math, csv
+
+import random
+import math
+import csv
 from person import Person
 from family import Family
 from community import Community
+
 
 class Tests:
 	def __init__(self):
@@ -11,7 +15,7 @@ class Tests:
 	def run(self):
 		c = Community()
 
-	## LEGACY
+	# LEGACY
 	def runCapTests(self):
 		f1 = Family(None)
 		with open("data.csv", "w", newline="") as csvFile:
@@ -68,6 +72,7 @@ class Tests:
 
 				f1.removePersonByIndex(1)
 				f1.removePersonByIndex(0)
+
 
 if __name__ == "__main__":
 	t = Tests()

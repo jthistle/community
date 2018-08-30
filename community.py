@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 
-import random, math
+import random
+import math
 from family import Family
 from person import Person
 from moods import MOODS
+from config import *
+
 
 class Community:
 	'Base community class'
-	__baseYear = 1443
+	__baseYear = BASE_YEAR
 
 	def __init__(self):
 		self.families = []
-		self.date = 0 # SET TO 0 IF NOT
+		self.date = 0  # SET TO 0 IF NOT
 		self.harshWinter = False
 		self.eventLog = []
 
@@ -21,10 +24,10 @@ class Community:
 		tempAdults = []
 		for i in range(6):
 			gender = "female"
-			if i%2 == 0:
+			if i % 2 == 0:
 				gender = "male"
 
-			tempAdults.append(Person([None, None], gender=gender, age=random.randint(18*4,25*4), married=True))
+			tempAdults.append(Person([None, None], gender=gender, age=random.randint(18 * 4, 25 * 4), married=True))
 
 		# keep track of already paired adults
 		pairedInd = []
@@ -34,19 +37,19 @@ class Community:
 				continue
 
 			highest = [0, 0]
-			for j in range(i+1, len(tempAdults)):
+			for j in range(i + 1, len(tempAdults)):
 				if j in pairedInd or tempAdults[i].gender == tempAdults[j].gender:
-					continue 
+					continue
 
 				# calculate mutual romantic interest
 				# This is done by dividing the sum of the interests by the difference,
 				# so that values that are closer are higher-valued
 				rom = tempAdults[i].calculateRomanticInterest(tempAdults[j])
 				recipRom = tempAdults[j].calculateRomanticInterest(tempAdults[i])
-				mutualRom = (rom + recipRom)/max(0.00001, abs(rom-recipRom))
+				mutualRom = (rom + recipRom)/max(0.00001, abs(rom - recipRom))
 				if mutualRom > highest[1]:
 					highest = [j, mutualRom]
-			
+
 			pairedInd = pairedInd + [i, highest[0]]
 			pairs.append([i, highest[0]])
 
@@ -130,18 +133,18 @@ class Community:
 		self.log("==== {} ====".format(self.dateToString().upper()))
 		if self.season() == 3:
 			# harsh winter
-			if random.randint(1,5) == 1: # TODO hardcoded
+			if random.randint(1, HARSH_WINTER_CHANCE) == 1:
 				self.log("The winter is a harsh one")
 				self.harshWinter = True
 				for p in self.allPeople():
-					p.addModifier(12) # add 'cold' modifier
+					p.addModifier(12)  # add 'cold' modifier
 			else:
 				self.harshWinter = False
 
 		for f in self.families:
 			f.passTime(self.date%4, self.harshWinter)
 
-		for p in self.allPeople(minAge=3*4):
+		for p in self.allPeople(minAge=START_INTERACTION_MIN_AGE):
 			# A person interacts with 0-10 people per day, based on extroversion
 			for i in range(math.ceil(p.getAttr("e")*10)):
 				# This next bit works by mapping by rapport. Basically,
@@ -154,9 +157,9 @@ class Community:
 						continue
 
 					if i in p.rapport.keys():
-						mappedByRapport[i] = p.rapport[i]+1 # +1 to make positive
+						mappedByRapport[i] = p.rapport[i]+1  # +1 to make positive
 					else:
-						mappedByRapport[i] = 1 # neutral
+						mappedByRapport[i] = 1  # neutral
 
 					# Younger people will want to talk to people of their own age.
 					# So, decrease the mapping by a number based on age.
@@ -164,8 +167,8 @@ class Community:
 					# Of course, this doesn't apply to family.
 					# This assumes that there is no age prejudice above 16 - TODO?
 					if i not in p.family.people:
-						addition = max(0, \
-							(16 - abs(i.age//4-p.age//4)) * max(0, (16*4/(16*4-p.age))) )
+						addition = max(0,
+							(16 - abs(i.age//4-p.age//4)) * max(0, (16*4/(16*4-p.age))))
 						mappedByRapport[i] = max(0, mappedByRapport[i] + addition)
 
 					totalRapport += mappedByRapport[i]
@@ -176,32 +179,31 @@ class Community:
 				for b in mappedByRapport.keys():
 					if currentNum + mappedByRapport[b] >= chosenNum:
 						# we have our person!
-						# Interactions produce rapport. The person initating the 
+						# Interactions produce rapport. The person initating the
 						# conversation gains more rapport for that person than the
 						# person does for the initiator.
-						# TODO hardcoded (loads)
 						if p.likes(b) and b.likes(p):
-							if random.randint(1,3) == 1 and p.age > 8*4 and b.age > 8*4:
+							if random.randint(1, DT_CHANCE) == 1 and p.age > DT_MIN_AGE and b.age > DT_MIN_AGE:
 								# deep talk
-								p.updateRapport(b, 0.09)
-								b.updateRapport(p, 0.06)
+								p.updateRapport(b, DT_RAPPORT_GAIN)
+								b.updateRapport(p, DT_RAPPORT_GAIN*INTERACTED_WITH_MOD)
 								p.log("I had a deep talk with {}".format(b.printableFullName()))
 								b.log("{} had a deep talk with me".format(p.printableFullName()))
 							else:
 								# quick chat
-								p.updateRapport(b, 0.03)
-								b.updateRapport(p, 0.02)
+								p.updateRapport(b, CHAT_RAPPORT_GAIN)
+								b.updateRapport(p, CHAT_RAPPORT_GAIN*INTERACTED_WITH_MOD)
 								p.log("I had a quick chat with {}".format(b.printableFullName()))
 								b.log("{} had a quick chat with me".format(p.printableFullName()))
 						else:
 							if b.age > 8*4 and p.age > 8*4:
-								p.updateRapport(b, -0.05)
-								b.updateRapport(p, -0.05)
+								p.updateRapport(b, ARGUMENT_RAPPORT_GAIN)
+								b.updateRapport(p, ARGUMENT_RAPPORT_GAIN)
 								p.log("I had an argument with {}".format(b.printableFullName()))
 								b.log("{} had an argument with me".format(p.printableFullName()))
 							else:
-								p.updateRapport(b, -0.05)
-								b.updateRapport(p, -0.05)
+								p.updateRapport(b, ANGRY_LOOK_RAPPORT_GAIN)
+								b.updateRapport(p, ANGRY_LOOK_RAPPORT_GAIN)
 								p.log("I gave {} an angry look".format(b.printableFullName()))
 								b.log("{} gave me an angry look".format(p.printableFullName()))
 						break
