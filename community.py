@@ -119,7 +119,7 @@ class Community:
 		for p in self.allPeople():
 			p.updateModifiers()
 
-		print("\n\n==== {} ====".format(self.dateToString().upper()))
+		self.log("==== {} ====".format(self.dateToString().upper()))
 		if self.season() == 3:
 			# harsh winter
 			if random.randint(1,5) == 1: # TODO hardcoded
@@ -166,19 +166,19 @@ class Community:
 								# deep talk
 								p.updateRapport(b, 0.09)
 								b.updateRapport(p, 0.06)
-								p.interactionLog.append("I had a deep talk with {}".format(b.printableFullName()))
-								b.interactionLog.append("{} had a deep talk with me".format(p.printableFullName()))
+								p.log("I had a deep talk with {}".format(b.printableFullName()))
+								b.log("{} had a deep talk with me".format(p.printableFullName()))
 							else:
 								# quick chat
 								p.updateRapport(b, 0.03)
 								b.updateRapport(p, 0.02)
-								p.interactionLog.append("I had a quick chat with {}".format(b.printableFullName()))
-								b.interactionLog.append("{} had a quick chat with me".format(p.printableFullName()))
+								p.log("I had a quick chat with {}".format(b.printableFullName()))
+								b.log("{} had a quick chat with me".format(p.printableFullName()))
 						else:
 							p.updateRapport(b, -0.05)
 							b.updateRapport(p, -0.05)
-							p.interactionLog.append("I had an argument with {}".format(b.printableFullName()))
-							b.interactionLog.append("{} had an argument with me".format(p.printableFullName()))
+							p.log("I had an argument with {}".format(b.printableFullName()))
+							b.log("{} had an argument with me".format(p.printableFullName()))
 						break
 					else:
 						currentNum += mappedByRapport[b]

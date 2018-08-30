@@ -53,6 +53,8 @@ class Family:
 		if p in self.people:
 			self.removePerson(p)
 			self.deadPeople.append(p)
+			self.log("{} died at the age of {}".format(p.printableFullName(), p.ageToString()))
+
 			# apply mood modifiers to:
 			# parents, siblings, children
 			if p.parents[0] != None:
@@ -75,6 +77,18 @@ class Family:
 					p.partner.addModifier(10)
 					print("debug partner died")
 
+	def seasonToString(self, n):
+		# Duplicate code, TODO move?
+		n = n%4
+		if n == 0:
+			return "Spring"
+		elif n == 1:
+			return "Summer"
+		elif n == 2:
+			return "Autumn"
+		elif n == 3:
+			return "Winter"
+
 	def log(self, s):
 		self.eventLog.append(s)
 
@@ -84,7 +98,7 @@ class Family:
 		# - Share out food (DONE)
 		# - Individual pass time (WIP)
 		# - Adjust merchant and farmer incomes (either too high or low)
-		print("\nEvents for the {} family".format(self.familyName.upper()))
+		self.log("== {} ==".format(self.seasonToString(season)))
 
 		adults = 0
 		children = 0
