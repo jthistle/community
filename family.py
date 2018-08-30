@@ -3,7 +3,6 @@
 import random, math
 from namegen import NameGen
 from person import Person
-from moods import MOODS
 
 nameGen = NameGen()
 
@@ -18,6 +17,7 @@ class Family:
 		self.familyName = nameGen.last()
 		self.food = 0
 		self.profession = random.choice(self.__professions)
+		self.eventLog = []
 
 	def addPerson(self, p, preserveSurname=False):
 		if not preserveSurname:
@@ -53,6 +53,8 @@ class Family:
 		if p in self.people:
 			self.removePerson(p)
 			self.deadPeople.append(p)
+			self.log("{} died at the age of {}".format(p.printableFullName(), p.ageToString()))
+
 			# apply mood modifiers to:
 			# parents, siblings, children
 			if p.parents[0] != None:
@@ -75,13 +77,28 @@ class Family:
 					p.partner.addModifier(10)
 					print("debug partner died")
 
+	def seasonToString(self, n):
+		# Duplicate code, TODO move?
+		n = n%4
+		if n == 0:
+			return "Spring"
+		elif n == 1:
+			return "Summer"
+		elif n == 2:
+			return "Autumn"
+		elif n == 3:
+			return "Winter"
+
+	def log(self, s):
+		self.eventLog.append(s)
+
 	def passTime(self, season, harshWinter):
 		# Family actions TODO
 		# - Calculate income of food (DONE)
 		# - Share out food (DONE)
 		# - Individual pass time (WIP)
 		# - Adjust merchant and farmer incomes (either too high or low)
-		print("\nEvents for the {} family".format(self.familyName.upper()))
+		self.log("== {} ==".format(self.seasonToString(season)))
 
 		adults = 0
 		children = 0
@@ -114,17 +131,17 @@ class Family:
 				yieldModifier = min(1.2, max(0.8, random.gauss(1, 0.1)))
 				if harshWinter:
 					yieldModifier *= 0.5 # TODO hardcoded
-					print("The harsh winter has reduced yields")
+					self.log("The harsh winter has reduced yields")
 
 				if yieldModifier >= 1:
 					goodHarvest = True
-					print("It has been a good harvest for the {} family".format(self.familyName))
+					self.log("It has been a good harvest for the {} family".format(self.familyName))
 
 				startFood = self.food
 				self.food += 50*yieldModifier*adults # TODO hardcoded
 				self.food += 25*yieldModifier*workingChildren # and here
 				self.food = round(self.food)
-				print("The family harvested {} units of food".format(self.food-startFood))
+				self.log("The family harvested {} units of food".format(self.food-startFood))
 		elif self.profession == "merchant":
 			# A merchant's income is a function of their intelligence,
 			# and is slightly random.
@@ -166,10 +183,10 @@ class Family:
 					p.addModifier(1)
 				elif childFood > 2:
 					p.addModifier(2)
-					print("{} is malnourised".format(p.firstName()))
+					self.log("{} is malnourised".format(p.firstName()))
 				else:
 					p.addModifier(3)
-					print("{} is starving".format(p.firstName()))
+					self.log("{} is starving".format(p.firstName()))
 			else:
 				if adultFood == 10:
 					p.addModifier(0)
@@ -177,23 +194,23 @@ class Family:
 					p.addModifier(1)
 				elif childFood > 4:
 					p.addModifier(2)
-					print("{} is malnourished".format(p.firstName()))
+					self.log("{} is malnourished".format(p.firstName()))
 				else:
 					p.addModifier(3)
-					print("{} is starving".format(p.firstName()))
+					self.log("{} is starving".format(p.firstName()))
 
 		if self.profession == "merchant":
 			if self.food > startFood:
 				madeProfit = True
-				print("The family made a profit of {} units of food".format(self.food-startFood))
+				self.log("The family made a profit of {} units of food".format(self.food-startFood))
 			else:
-				print("The family made a loss of {} units of food".format(self.food-startFood))
+				self.log("The family made a loss of {} units of food".format(self.food-startFood))
 		elif self.profession == "farmer":
 			# just some flavour text
 			if season == 0:
-				print("The family is sowing the fields")
+				self.log("The family is sowing the fields")
 			elif season == 3:
-				print("The remains of the harvest wither and die in the cold")
+				self.log("The remains of the harvest wither and die in the cold")
 
 
 		for p in self.people:
@@ -204,8 +221,18 @@ class Family:
 
 		if self.food > len(self.people)*100:
 			self.food = len(self.people)*100
-			print("The family struggles to store so much food, and some of it perishes")
-		print("The family ends the season with {} units of food".format(self.food))
+			self.log("The family struggles to store so much food, and some of it perishes")
+		self.log("The family ends the season with {} units of food".format(self.food))
+
+	def inspect(self):
+		'''
+		Returns some text for the GUI inspector
+		'''
+		toReturn = []
+		toReturn.append("== The {} family ==".format(self.familyName.upper()))
+		toReturn.append("A family of {}s".format(self.profession))
+		toReturn.append("The family posesses {} units of food".format(self.food))
+		return "\n".join(toReturn)
 
 	def __str__(self):
 		toReturn = []

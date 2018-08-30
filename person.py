@@ -34,7 +34,7 @@ class Person:
 		self.married = married
 		self.alive = True
 		self.family = family
-		self.interactionLog = []	# stores text log of interactions
+		self.eventLog = []			# stores text log of interactions
 		self.modifiers = {}			# mood modifiers
 		self.rapport = {}			# stores rapport with other people
 		
@@ -63,6 +63,7 @@ class Person:
 		# TODO
 		# Add function to perform actions based on mood or events?
 		self.age += 1
+		self.log("== {} ==".format(self.ageToString()))
 
 		# life expectancy is calculated by another random truncated gaussian distribution
 		if self.age > self.lifetime:
@@ -77,11 +78,11 @@ class Person:
 			print("{} attempted suicide".format(self.firstName()))
 			self.die() # TODO - maybe not every time
 		elif self.getMood() <= -1.5:
-			print("{} is feeling very bad".format(self.firstName()))
+			print("feeling very bad".format(self.firstName()))
 		elif self.getMood() > 1.5:
-			print("{} is feeling really good".format(self.firstName()))
+			print("feeling really good".format(self.firstName()))
 		elif self.getMood() > 2:
-			print("{} is feeling euphoric".format(self.firstName()))
+			print("feeling euphoric".format(self.firstName()))
 
 		# Rapport decays towards 0 by 0.05 per season
 		for r in self.rapport.keys():
@@ -152,7 +153,6 @@ class Person:
 	def die(self):
 		# TODO: other things, I guess
 		self.alive = False
-		print("{} died at the age of {}".format(self.printableFullName(), self.ageToString()))
 		self.family.memberDied(self)
 
 	def rapportStatus(self, b):
@@ -168,7 +168,7 @@ class Person:
 			elif rp >= 0.8:
 				return "{} gets on great with {}".format(n1, n2)
 			elif rp >= 0.5:
-				return "{} is friends with {}".format(n1, n2)
+				return "friends with {}".format(n1, n2)
 			elif rp >= 0.2:
 				return "{} has chatted with {}".format(n1, n2)
 			elif rp >= 0.0:
@@ -195,12 +195,12 @@ class Person:
 
 		toReturn = []
 		if len(bestFriends) > 0:
-			toReturn.append("{} is best friends with: ".format(self.firstName()))
+			toReturn.append("best friends with: ".format(self.firstName()))
 			toReturn = toReturn + [x.printableFullName() for x in bestFriends]
 		else:
 			toReturn.append("{} has no best friends".format(self.firstName()))
 		if len(friends) > 0:
-			toReturn.append("{} is friends with: ".format(self.firstName()))
+			toReturn.append("friends with: ".format(self.firstName()))
 			toReturn = toReturn + [x.printableFullName() for x in friends]
 		else:
 			toReturn.append("{} has no friends".format(self.firstName()))
@@ -411,69 +411,71 @@ class Person:
 			val = self.getAttr(attr)
 			if attr == "o":
 				if val > 0.8:
-					toReturn.append("{} is very inventive and creative".format(self.firstName()))
+					toReturn.append("very inventive and creative")
 				elif val > 0.5:
-					toReturn.append("{} is fairly inventive and creative".format(self.firstName()))
+					toReturn.append("fairly inventive and creative")
 				elif val > 0.2:
-					toReturn.append("{} is fairly consistent and cautious".format(self.firstName()))
+					toReturn.append("fairly consistent and cautious")
 				else:
-					toReturn.append("{} is very consistent and cautious".format(self.firstName()))
+					toReturn.append("very consistent and cautious")
 			elif attr == "c":
 				if val > 0.8:
-					toReturn.append("{} is very efficient and organised".format(self.firstName()))
+					toReturn.append("very efficient and organised")
 				elif val > 0.5:
-					toReturn.append("{} is fairly efficient and organised".format(self.firstName()))
+					toReturn.append("fairly efficient and organised")
 				elif val > 0.2:
-					toReturn.append("{} is fairly easy-going and careless".format(self.firstName()))
+					toReturn.append("fairly easy-going and careless")
 				else:
-					toReturn.append("{} is very easy-going and careless".format(self.firstName()))
+					toReturn.append("very easy-going and careless")
 			elif attr == "e":
 				if val > 0.8:
-					toReturn.append("{} is very outgoing and energetic".format(self.firstName()))
+					toReturn.append("very outgoing and energetic")
 				elif val > 0.5:
-					toReturn.append("{} is fairly outgoing and energetic".format(self.firstName()))
+					toReturn.append("fairly outgoing and energetic")
 				elif val > 0.2:
-					toReturn.append("{} is fairly solitary and reserved".format(self.firstName()))
+					toReturn.append("fairly solitary and reserved")
 				else:
-					toReturn.append("{} is very solitary and reserved".format(self.firstName()))
+					toReturn.append("very solitary and reserved")
 			elif attr == "a":
 				if val > 0.8:
-					toReturn.append("{} is very friendly and compassionate".format(self.firstName()))
+					toReturn.append("very friendly and compassionate")
 				elif val > 0.5:
-					toReturn.append("{} is fairly friendly and compassionate".format(self.firstName()))
+					toReturn.append("fairly friendly and compassionate")
 				elif val > 0.2:
-					toReturn.append("{} is fairly antagonistic and detatched".format(self.firstName()))
+					toReturn.append("fairly antagonistic and detatched")
 				else:
-					toReturn.append("{} is very antagonistic and detatched".format(self.firstName()))
+					toReturn.append("very antagonistic and detatched")
 			elif attr == "n":
 				if val > 0.8:
-					toReturn.append("{} is very insecure and nervous".format(self.firstName()))
+					toReturn.append("very insecure and nervous")
 				elif val > 0.5:
-					toReturn.append("{} is fairly insecure and nervous".format(self.firstName()))
+					toReturn.append("fairly insecure and nervous")
 				elif val > 0.2:
-					toReturn.append("{} is fairly secure and confident".format(self.firstName()))
+					toReturn.append("fairly secure and confident")
 				else:
-					toReturn.append("{} is very secure and confident".format(self.firstName()))
+					toReturn.append("very secure and confident")
 			elif attr == "p":
 				if val > 0.8:
-					toReturn.append("{} is very good-looking".format(self.firstName()))
+					toReturn.append("very good-looking")
 				elif val > 0.5:
-					toReturn.append("{} is fairly good-looking".format(self.firstName()))
+					toReturn.append("fairly good-looking")
 				elif val > 0.2:
-					toReturn.append("{} isn't very good-looking".format(self.firstName()))
+					toReturn.append("not very good-looking")
 				else:
-					toReturn.append("{} isn't good-looking".format(self.firstName()))
+					toReturn.append("not good-looking")
 			elif attr == "i":
 				if val > 0.8:
-					toReturn.append("{} is very intelligent".format(self.firstName()))
+					toReturn.append("very intelligent")
 				elif val > 0.5:
-					toReturn.append("{} is fairly intelligent".format(self.firstName()))
+					toReturn.append("fairly intelligent")
 				elif val > 0.2:
-					toReturn.append("{} isn't very intelligent".format(self.firstName()))
+					toReturn.append("not very intelligent")
 				else:
-					toReturn.append("{} isn't intelligent".format(self.firstName()))
+					toReturn.append("not intelligent")
 
-		return "\n".join(toReturn)
+		strToReturn = "{} is {} and {}.".format(self.firstName(), ", ".join(toReturn[:len(toReturn)-1]),\
+		 toReturn[len(toReturn)-1])
+		return strToReturn
 
 	def otherAttributesAsDescription(self):
 		bm = self.baseMood()
@@ -483,45 +485,48 @@ class Person:
 
 		toReturn = []
 		if em > 0.8:
-			toReturn.append("{} is very emotional".format(self.firstName()))
+			toReturn.append("very emotional")
 		elif em > 0.5:
-			toReturn.append("{} is fairly emotional".format(self.firstName()))
+			toReturn.append("fairly emotional")
 		elif em > 0.2:
-			toReturn.append("{} is fairly unemotional".format(self.firstName()))
+			toReturn.append("fairly unemotional")
 		else:
-			toReturn.append("{} is very unemotional".format(self.firstName()))
+			toReturn.append("very unemotional")
 
 		if po > 0.8:
-			toReturn.append("{} is very left-wing".format(self.firstName()))
+			toReturn.append("very left-wing")
 		elif po > 0.5:
-			toReturn.append("{} is centre-left-wing".format(self.firstName()))
+			toReturn.append("centre-left-wing")
 		elif po > 0.2:
-			toReturn.append("{} is centre-right-wing".format(self.firstName()))
+			toReturn.append("centre-right-wing")
 		else:
-			toReturn.append("{} is very right-wing".format(self.firstName()))
+			toReturn.append("very right-wing")
 
 		if so > 0.9:
-			toReturn.append("{} is a sociopath".format(self.firstName()))
+			toReturn.append("a sociopath")
 		elif so > 0.6:
-			toReturn.append("{} shows sociopathic tendencies".format(self.firstName()))
+			toReturn.append("shows sociopathic tendencies")
 		else:
-			toReturn.append("{} isn't a sociopath".format(self.firstName()))
+			toReturn.append("not a sociopath")
 
 		if bm > 0.6:
-			toReturn.append("{} is an optimist".format(self.firstName()))
+			toReturn.append("an optimist")
 		elif bm > 0.0:
-			toReturn.append("{} is fairly optimistic".format(self.firstName()))
+			toReturn.append("fairly optimistic")
 		elif bm > -0.6:
-			toReturn.append("{} is fairly pessimistic".format(self.firstName()))
+			toReturn.append("fairly pessimistic")
 		else:
-			toReturn.append("{} is very pessimistic".format(self.firstName()))
+			toReturn.append("very pessimistic")
 
-		return "\n".join(toReturn)
+		strToReturn = "{} is also {} and {}.".format(self.firstName(), ", ".join(toReturn[:len(toReturn)-1]),\
+		 toReturn[len(toReturn)-1])
+
+		return strToReturn
 
 	def getLastInteractions(self, n):
 		toReturn = []
-		for i in range(min(len(self.interactionLog), n)):
-			toReturn.append(self.interactionLog[i])
+		for i in range(min(len(self.eventLog), n)):
+			toReturn.append(self.eventLog[i])
 		return "\n".join(toReturn)
 
 	def compareTo(self, b):
@@ -532,6 +537,22 @@ class Person:
 		toReturn = []
 		toReturn.append("{} {}.".format(self.explainCap(b), capitalizePreserve(self.rapportStatus(b))))
 		toReturn.append("{} {}.".format(b.explainCap(self), capitalizePreserve(b.rapportStatus(self))))
+		return "\n".join(toReturn)
+
+	def log(self, s):
+		self.eventLog.append(s)
+
+	def inspect(self):
+		'''
+		Returns some text for the GUI inspector
+		'''
+		toReturn = []
+		toReturn.append("== {} ==".format(self.printableFullName()))
+		toReturn.append("Aged {}".format(self.ageToString()))
+		toReturn.append("Gender {}".format(self.gender))
+		toReturn.append(self.attributesAsDescription()+" "+self.otherAttributesAsDescription())
+		toReturn.append("{} is feeling {}.".format(self.firstName(), self.oneWordMood()))
+
 		return "\n".join(toReturn)
 
 	def __str__(self):
