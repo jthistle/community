@@ -1,7 +1,7 @@
 language: python
-  python:
-    - "3.6"
-  install:
-    - ./travis/install.sh
-  script:
-    - ./tests.py
+python:
+	"3.6"
+install:
+	./travis/install.sh
+script:
+	./tests.py
