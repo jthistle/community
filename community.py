@@ -4,10 +4,11 @@ import random, math
 from family import Family
 from person import Person
 from moods import MOODS
+from config import *
 
 class Community:
 	'Base community class'
-	__baseYear = 1443
+	__baseYear = BASE_YEAR
 
 	def __init__(self):
 		self.families = []
@@ -130,7 +131,7 @@ class Community:
 		self.log("==== {} ====".format(self.dateToString().upper()))
 		if self.season() == 3:
 			# harsh winter
-			if random.randint(1,5) == 1: # TODO hardcoded
+			if random.randint(1,HARSH_WINTER_CHANCE) == 1:
 				self.log("The winter is a harsh one")
 				self.harshWinter = True
 				for p in self.allPeople():
@@ -141,7 +142,7 @@ class Community:
 		for f in self.families:
 			f.passTime(self.date%4, self.harshWinter)
 
-		for p in self.allPeople(minAge=3*4):
+		for p in self.allPeople(minAge=START_INTERACTION_MIN_AGE):
 			# A person interacts with 0-10 people per day, based on extroversion
 			for i in range(math.ceil(p.getAttr("e")*10)):
 				# This next bit works by mapping by rapport. Basically,
@@ -179,29 +180,28 @@ class Community:
 						# Interactions produce rapport. The person initating the 
 						# conversation gains more rapport for that person than the
 						# person does for the initiator.
-						# TODO hardcoded (loads)
 						if p.likes(b) and b.likes(p):
-							if random.randint(1,3) == 1 and p.age > 8*4 and b.age > 8*4:
+							if random.randint(1,DT_CHANCE) == 1 and p.age > DT_MIN_AGE and b.age > DT_MIN_AGE:
 								# deep talk
-								p.updateRapport(b, 0.09)
-								b.updateRapport(p, 0.06)
+								p.updateRapport(b, DT_RAPPORT_GAIN)
+								b.updateRapport(p, DT_RAPPORT_GAIN*INTERACTED_WITH_MOD)
 								p.log("I had a deep talk with {}".format(b.printableFullName()))
 								b.log("{} had a deep talk with me".format(p.printableFullName()))
 							else:
 								# quick chat
-								p.updateRapport(b, 0.03)
-								b.updateRapport(p, 0.02)
+								p.updateRapport(b, CHAT_RAPPORT_GAIN)
+								b.updateRapport(p, CHAT_RAPPORT_GAIN*INTERACTED_WITH_MOD)
 								p.log("I had a quick chat with {}".format(b.printableFullName()))
 								b.log("{} had a quick chat with me".format(p.printableFullName()))
 						else:
 							if b.age > 8*4 and p.age > 8*4:
-								p.updateRapport(b, -0.05)
-								b.updateRapport(p, -0.05)
+								p.updateRapport(b, ARGUMENT_RAPPORT_GAIN)
+								b.updateRapport(p, ARGUMENT_RAPPORT_GAIN)
 								p.log("I had an argument with {}".format(b.printableFullName()))
 								b.log("{} had an argument with me".format(p.printableFullName()))
 							else:
-								p.updateRapport(b, -0.05)
-								b.updateRapport(p, -0.05)
+								p.updateRapport(b, ANGRY_LOOK_RAPPORT_GAIN)
+								b.updateRapport(p, ANGRY_LOOK_RAPPORT_GAIN)
 								p.log("I gave {} an angry look".format(b.printableFullName()))
 								b.log("{} gave me an angry look".format(p.printableFullName()))
 						break

@@ -3,6 +3,7 @@
 import random, math
 from namegen import NameGen
 from moods import MOODS
+from config import *
 
 nameGen = NameGen()
 
@@ -20,11 +21,10 @@ class Person:
 	Intelligence
 	'''
 
-	# TODO hardcoded: place in config file
-	__genders = ["male", "female"]
-	__attributes = ["o", "c", "e", "a", "n", "p", "i"]
-	__capCutoff = 3.5
-	__lifeExpectancy = 40*4
+	__genders = GENDERS
+	__attributes = ATTRIBUTES
+	__capCutoff = CAP_CUTOFF
+	__lifeExpectancy = LIFE_EXPECTANCY
 
 	def __init__(self, parents, family=None, partner=None, gender="", age=0, surname="", married=False):
 		self.parents = parents
@@ -39,7 +39,7 @@ class Person:
 		self.rapport = {}			# stores rapport with other people
 		
 		# very fatalistic, but generates a lifetime for a person
-		self.lifetime = random.gauss(self.__lifeExpectancy, 5*4) # TODO hardcoded
+		self.lifetime = random.gauss(self.__lifeExpectancy, LIFE_EXPECTANCY_SD)
 
 		if gender != "":
 			if gender == "male":
@@ -60,8 +60,6 @@ class Person:
 			self.name = nameGen.full(self.gender)
 
 	def passTime(self):
-		# TODO
-		# Add function to perform actions based on mood or events?
 		self.age += 1
 		self.log("== {} ==".format(self.ageToString()))
 
@@ -71,9 +69,8 @@ class Person:
 			return True
 
 		# mood level at which someone will commit suicide is currently
-		# hardcoded. Could be a function of something in future?
-		# was previouslymin(1.9, 2 - 0.5*self.getAttr("n"))
-		suicideLevel = -1.9
+		# TODO Could be a function of something in future?
+		suicideLevel = SUICIDE_MIN_MOOD_LEVEL
 		if self.getMood() <= suicideLevel and not self.isChild():
 			print("{} attempted suicide".format(self.firstName()))
 			self.die() # TODO - maybe not every time
@@ -84,12 +81,12 @@ class Person:
 		elif self.getMood() > 2:
 			print("feeling euphoric".format(self.firstName()))
 
-		# Rapport decays towards 0 by 0.05 per season
+		# Rapport decays towards 0 by a set value per season
 		for r in self.rapport.keys():
-			if self.rapport[r] >= 0.05:
-				self.rapport[r] -= 0.05
-			elif self.rapport[r] <= -0.05:
-				self.rapport[r] += 0.05
+			if self.rapport[r] >= RAPPORT_DECAY:
+				self.rapport[r] -= RAPPORT_DECAY
+			elif self.rapport[r] <= -RAPPORT_DECAY:
+				self.rapport[r] += RAPPORT_DECAY
 			else:
 				self.rapport[r] = 0
 		
