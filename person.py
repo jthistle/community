@@ -207,6 +207,19 @@ class Person:
 			return True
 		return False
 
+	def isRelative(self, b):
+		if b in self.family.people:
+			return True
+		if b in self.children:
+			return True
+		if self.parents[0] is not None:
+			geneticFamily = self.father().family
+			if b in geneticFamily.people:
+				return True
+			siblings = self.father().children
+			if b in siblings:
+				return True
+
 	def firstName(self):
 		return self.name[0]
 
@@ -263,7 +276,7 @@ class Person:
 		# sort by rapport
 		sortedRapportKeys = sorted(list(self.rapport.keys()), key=lambda x: self.rapport[x], reverse=True)
 		for p in sortedRapportKeys:
-			if p in self.family.people or not p.alive:
+			if self.isRelative(p) or not p.alive:
 				continue
 			if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
 				bestFriends.append(p)
@@ -326,20 +339,20 @@ class Person:
 			self.children.append(p)
 
 	def father(self):
-		if parents[0] is None:
+		if self.parents[0] is None:
 			return False
-		elif parents[0].gender == "male":
-			return parents[0]
+		elif self.parents[0].gender == "male":
+			return self.parents[0]
 		else:
-			return parents[1]
+			return self.parents[1]
 
 	def mother(self):
-		if parents[0] is None:
+		if self.parents[0] is None:
 			return False
-		elif parents[0].gender == "female":
-			return parents[0]
+		elif self.parents[0].gender == "female":
+			return self.parents[0]
 		else:
-			return parents[1]
+			return self.parents[1]
 
 	def baseMood(self):
 		return self.getAttr("e") - self.getAttr("n")

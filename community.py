@@ -14,6 +14,7 @@ class Community:
 
 	def __init__(self):
 		self.families = []
+		self.deadFamilies = []
 		self.date = 0  # SET TO 0 IF NOT
 		self.harshWinter = False
 		self.eventLog = []
@@ -91,6 +92,10 @@ class Community:
 	def addFamily(self, f):
 		self.families.append(f)
 
+	def removeFamily(self, f):
+		if f in self.families:
+			self.families.remove(f)
+
 	def newFamily(self, familyName=None):
 		f = Family(self, familyName=familyName)
 		self.addFamily(f)
@@ -148,6 +153,12 @@ class Community:
 				self.harshWinter = False
 
 		for f in self.families:
+			if len(f.people) == 0:
+				# everyone's died
+				self.log("The old house of the {} family is left deserted".format(f.familyName))
+				self.removeFamily(f)
+				self.deadFamilies.append(f)
+
 			f.passTime(self.date%4, self.harshWinter)
 
 		for p in self.allPeople(minAge=START_INTERACTION_MIN_AGE):
@@ -202,7 +213,7 @@ class Community:
 								# TODO change wording and other stuff for existing partner
 								if p.romanticallyLikes(b) and p.age >= MIN_ASKOUT_AGE\
 									and b.age >= MIN_ASKOUT_AGE and not p.married and not b.married\
-									and b not in p.family.people and p.gender != b.gender\
+									and not p.isRelative(b) and p.gender != b.gender\
 									and ((p.timeWithPartner >= 2 and b.timeWithPartner >= 2) or
 										(p.partner is None and b.partner is None)):
 									cont = True
