@@ -13,14 +13,18 @@ class Family:
 	'Base family class'
 	__professions = PROFESSIONS
 
-	def __init__(self, community):
+	def __init__(self, community, familyName=None):
 		self.people = []
 		self.deadPeople = []
-		self.familyName = nameGen.last()
 		self.food = 0
 		self.profession = random.choice(self.__professions)
 		self.eventLog = []
 		self.community = community
+
+		if familyName is not None:
+			self.familyName = familyName
+		else:
+			self.familyName = nameGen.last()
 
 	def addPerson(self, p, preserveSurname=False):
 		if not preserveSurname:

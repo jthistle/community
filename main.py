@@ -91,7 +91,7 @@ class Application(Frame):
 		self.familiesList.delete(0, END)
 		for f in self.community.families:
 			self.familiesList.insert(END, f.familyName)
-		self.familiesList.insert(END, "Graveyard")
+		self.familiesList.insert(END, "[Graveyard]")
 		self.updatePeopleList()
 		self.updateMainEventLog()
 

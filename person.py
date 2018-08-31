@@ -75,6 +75,35 @@ class Person:
 			self.partner.partner = None
 			self.partner = None
 
+	def marryPartner(self):
+		if self.partner is not None and not self.married:
+			self.log("I married {}".format(self.partner.printableFullName()))
+			self.partner.log("I married {}".format(self.printableFullName()))
+			self.family.community.log("{} married {}".format(
+				self.printableFullName(), self.partner.printableFullName()))
+			self.married = True
+			self.partner.married = True
+			self.addModifier(5)
+			self.partner.addModifier(5)
+
+			# Change name and create new family
+			if self.gender == "female":
+				self.name[1] = self.partner.name[1]
+			else:
+				self.partner.name[1] = self.name[1]
+
+			newFamily = self.family.community.newFamily(familyName=self.surname())
+			self.family.removePerson(self)
+			self.partner.family.removePerson(self.partner)
+
+			self.family = newFamily
+			self.partner.family = newFamily
+			newFamily.addPerson(self, preserveSurname=True)
+			newFamily.addPerson(self.partner, preserveSurname=True)
+
+			self.family.community.log("The couple have established a family of {}s".format(
+				self.family.profession))
+
 	def passTime(self):
 		self.age += 1
 		if self.partner is not None and not self.married:
@@ -82,6 +111,12 @@ class Person:
 			# decide whether to break up
 			if self.timeWithPartner >= 2 and not self.romanticallyLikes(self.partner):
 				self.breakUp()
+
+			if self.timeWithPartner >= MARRIAGE_MIN_TIME and self.age >= MARRIAGE_MIN_AGE and\
+				self.partner.age >= MARRIAGE_MIN_AGE:
+				# Get married! Other marraige conditions can go here in the future
+				if self.romanticallyLikes(self.partner) and self.partner.romanticallyLikes(self):
+					self.marryPartner()
 		else:
 			self.timeWithPartner = 0
 

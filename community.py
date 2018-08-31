@@ -91,6 +91,11 @@ class Community:
 	def addFamily(self, f):
 		self.families.append(f)
 
+	def newFamily(self, familyName=None):
+		f = Family(self, familyName=familyName)
+		self.addFamily(f)
+		return f
+
 	def getFamilyByIndex(self, i):
 		if i < len(self.families):
 			return self.families[i]
@@ -242,12 +247,12 @@ class Community:
 								b.log("{} had a quick chat with me".format(p.printableFullName()))
 						else:
 							if b.age > MIN_ARGUMENT_AGE and p.age > MIN_ARGUMENT_AGE:
-								p.updateRapport(b, ARGUMENT_RAPPORT_GAIN*CAP_MODIFIER)
+								p.updateRapport(b, ARGUMENT_RAPPORT_GAIN*INTERACTED_WITH_MOD)
 								b.updateRapport(p, ARGUMENT_RAPPORT_GAIN)
 								p.log("I had an argument with {}".format(b.printableFullName()))
 								b.log("{} had an argument with me".format(p.printableFullName()))
 							else:
-								p.updateRapport(b, ANGRY_LOOK_RAPPORT_GAIN*CAP_MODIFIER)
+								p.updateRapport(b, ANGRY_LOOK_RAPPORT_GAIN*INTERACTED_WITH_MOD)
 								b.updateRapport(p, ANGRY_LOOK_RAPPORT_GAIN)
 								p.log("I gave {} an angry look".format(b.printableFullName()))
 								b.log("{} gave me an angry look".format(p.printableFullName()))

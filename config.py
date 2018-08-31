@@ -58,3 +58,7 @@ INTERACTED_WITH_MOD = (2/3)
 
 FRIEND_THRESHOLD = 0.5
 BEST_FRIEND_THRESHOLD = 0.8
+
+# Minimum time spent together before marriage
+MARRIAGE_MIN_TIME = 6
+MARRIAGE_MIN_AGE = 18*4
