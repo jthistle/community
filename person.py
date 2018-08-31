@@ -347,7 +347,18 @@ class Person:
 		return False
 
 	def getAttr(self, letter):
-		return self.attributes[letter]
+		'''
+		Returns attribute, but with age differences applied.
+		Openness, extroversion and neuroticism decrease over time,
+		but conscientiousness and agreeableness increase.
+		'''
+		mod = 0
+		if letter in ["o", "e", "n"]:
+			mod = -ATTRIBUTE_CHANGE * (self.age/ATTRIBUTE_CHANGE_AGE)
+		elif letter in ["c", "a"]:
+			mod = ATTRIBUTE_CHANGE * (self.age/ATTRIBUTE_CHANGE_AGE)
+
+		return min(1, max(0, self.attributes[letter]+mod))
 
 	def explainCap(self, b):
 		'''
@@ -606,7 +617,10 @@ class Person:
 		toReturn.append("{} is feeling {} {}.".format(self.firstName(), self.oneWordMood(), self.moodReasons()))
 		toReturn.append("{}.".format(self.friends()))
 		if self.married:
-			toReturn.append("{} is married to {}.".format(self.firstName(), self.partner.printableFullName()))
+			if self.partner.alive:
+				toReturn.append("{} is married to {}.".format(self.firstName(), self.partner.printableFullName()))
+			else:
+				toReturn.append("{} is a widow(er).".format(self.firstName()))
 		elif self.partner is not None:
 			toReturn.append("{} has been going out with {} for {} seasons.".format(
 				self.firstName(), self.partner.printableFullName(), self.timeWithPartner))

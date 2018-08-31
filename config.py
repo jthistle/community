@@ -13,6 +13,9 @@ LIFE_EXPECTANCY = 40*4
 # standard deviation for life expectancy random gaussian distribution
 LIFE_EXPECTANCY_SD = 5*4
 
+ATTRIBUTE_CHANGE = 0.2
+ATTRIBUTE_CHANGE_AGE = 50*4
+
 HARSH_WINTER_CHANCE = 5
 HARSH_WINTER_MOD = 0.5
 

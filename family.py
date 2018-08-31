@@ -81,6 +81,8 @@ class Family:
 				else:
 					p.partner.addModifier(10)
 					print("debug partner died")
+					p.partner.partner = None
+					p.partner = None
 
 	def seasonToString(self, n):
 		# Duplicate code, TODO move?
