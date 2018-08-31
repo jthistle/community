@@ -198,6 +198,7 @@ class Application(Frame):
 		if len(self.familiesList.curselection()) > 0:
 			ind = int(self.familiesList.curselection()[0])
 			self.selectedFamily = ind
+			self.selectedPerson = None
 			self.updatePeopleList()
 
 			# check if graveyard selected
