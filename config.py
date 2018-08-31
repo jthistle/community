@@ -45,6 +45,8 @@ CHAT_RAPPORT_GAIN = 0.03
 ARGUMENT_RAPPORT_GAIN = -0.05
 ANGRY_LOOK_RAPPORT_GAIN = -0.03
 
+MIN_ARGUMENT_AGE = 5*4
+
 # Modifier applied to rapport if someone else initiated
 # the interaction.
 INTERACTED_WITH_MOD = (2/3)

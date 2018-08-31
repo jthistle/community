@@ -46,7 +46,7 @@ class Community:
 				# so that values that are closer are higher-valued
 				rom = tempAdults[i].calculateRomanticInterest(tempAdults[j])
 				recipRom = tempAdults[j].calculateRomanticInterest(tempAdults[i])
-				mutualRom = (rom + recipRom)/max(0.00001, abs(rom - recipRom))
+				mutualRom = (rom+recipRom)/max(0.00001, abs(rom-recipRom))
 				if mutualRom > highest[1]:
 					highest = [j, mutualRom]
 
@@ -85,8 +85,7 @@ class Community:
 			# Give enough food for the year
 			tempFamily.food = (10*2 + 6*childrenCount)*4
 
-		# Show who's in the community
-		print(self)
+
 		# Pass time once without increasing the date
 		self.passTime(False)
 
@@ -168,7 +167,7 @@ class Community:
 					# This assumes that there is no age prejudice above 16 - TODO?
 					if i not in p.family.people:
 						addition = max(0,
-							(16 - abs(i.age//4-p.age//4)) * max(0, (16*4/(16*4-p.age))))
+							(8 - abs(i.age//4-p.age//4)) * max(0, ((16*4-p.age)/16*4)))
 						mappedByRapport[i] = max(0, mappedByRapport[i] + addition)
 
 					totalRapport += mappedByRapport[i]
@@ -196,7 +195,7 @@ class Community:
 								p.log("I had a quick chat with {}".format(b.printableFullName()))
 								b.log("{} had a quick chat with me".format(p.printableFullName()))
 						else:
-							if b.age > 8*4 and p.age > 8*4:
+							if b.age > MIN_ARGUMENT_AGE and p.age > MIN_ARGUMENT_AGE:
 								p.updateRapport(b, ARGUMENT_RAPPORT_GAIN)
 								b.updateRapport(p, ARGUMENT_RAPPORT_GAIN)
 								p.log("I had an argument with {}".format(b.printableFullName()))

@@ -10,24 +10,6 @@ from community import Community
 from tests import Tests
 
 
-def takeMenuInput(min, max):
-	'Min - max is inclusive'
-	choice = max+1
-	while choice > max:
-		try:
-			choice = int(input("> "))
-		except Exception as e:
-			if e == EOFError or e == KeyboardInterrupt:
-				endProgram()
-			else:
-				print("Must be a number")
-	return choice
-
-
-def endProgram():
-	sys.exit()
-
-
 class Application(Frame):
 	def __init__(self, master=None):
 		super().__init__(master)
