@@ -59,13 +59,13 @@ class Application(Frame):
 
 		self.familiesLabel = Label(self.restFrame, text="Families")
 		self.familiesLabel.grid(row=0, column=0, sticky=W)
-		self.familiesList = Listbox(self.restFrame)
+		self.familiesList = Listbox(self.restFrame, exportselection=False)
 		self.familiesList.grid(row=1, column=0, sticky=E+W, padx=5)
 		self.familiesList.bind('<<ListboxSelect>>', self.onFamiliesLbChange)
 
 		self.peopleLabel = Label(self.restFrame, text="People")
 		self.peopleLabel.grid(row=0, column=1, sticky=W)
-		self.peopleList = Listbox(self.restFrame)
+		self.peopleList = Listbox(self.restFrame, exportselection=False)
 		self.peopleList.grid(row=1, column=1, sticky=E+W, padx=5)
 		self.peopleList.bind('<<ListboxSelect>>', self.onPeopleLbChange)
 
@@ -104,6 +104,9 @@ class Application(Frame):
 		for f in self.community.families:
 			self.familiesList.insert(END, f.familyName)
 		self.familiesList.insert(END, "[Graveyard]")
+		# Set previous selection
+		if self.selectedFamily is not None:
+			self.familiesList.selection_set(self.selectedFamily)
 		self.updatePeopleList()
 		self.updateMainEventLog()
 		self.updateInspectorButtons()
@@ -137,6 +140,9 @@ class Application(Frame):
 				graveyard = self.community.graveyard()
 				for p in graveyard:
 					self.peopleList.insert(END, p.printableFullName())
+
+		if self.selectedFamily is not None and self.selectedPerson is not None:
+			self.peopleList.selection_set(self.selectedPerson)
 
 	def updateInspectorButtons(self):
 		partner = self.partnerBtn
@@ -276,8 +282,10 @@ class Application(Frame):
 			else:
 				# graveyard is selected
 				graveyard = self.community.graveyard()
-				p = graveyard[self.selectedPerson]
-				return p
+				if self.selectedPerson < len(graveyard):
+					p = graveyard[self.selectedPerson]
+					return p
+				return False
 
 	def passTime(self):
 		self.community.passTime()

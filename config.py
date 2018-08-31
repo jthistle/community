@@ -62,3 +62,6 @@ BEST_FRIEND_THRESHOLD = 0.8
 # Minimum time spent together before marriage
 MARRIAGE_MIN_TIME = 6
 MARRIAGE_MIN_AGE = 18*4
+
+BABY_MAX_AMOUNT = 6
+BASE_BABY_CHANCE = 20

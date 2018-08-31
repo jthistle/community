@@ -106,6 +106,8 @@ class Person:
 
 	def passTime(self):
 		self.age += 1
+		self.log("== {} ==".format(self.ageToString()))
+
 		if self.partner is not None and not self.married:
 			self.timeWithPartner += 1
 			# decide whether to break up
@@ -120,7 +122,31 @@ class Person:
 		else:
 			self.timeWithPartner = 0
 
-		self.log("== {} ==".format(self.ageToString()))
+		if self.married:
+			# Decide whether to have baby, but only if married, and both people
+			# still are attracted to each other. Chance of baby decreases with number of
+			# children.
+			# probably a bad way to find lowest age
+			if len(self.children) > 0:
+				lowestAge = self.children[len(self.children)-1].age
+			else:
+				lowestAge = 4
+
+			if lowestAge > 3 and\
+				len(self.children) < BABY_MAX_AMOUNT and\
+				self.romanticallyLikes(self.partner) and self.partner.romanticallyLikes(self):
+				if random.randint(1, BASE_BABY_CHANCE*(len(self.children)+1)) == 1:
+					child = self.family.generatePerson([self, self.partner])
+					if self.gender == "female":
+						self.log("I gave birth to {}".format(child.firstName()))
+						self.family.community.log("{} gave birth to {}".format(self.printableFullName(),
+							child.firstName()))
+					else:
+						self.log("My wife gave birth to {}".format(child.firstName()))
+						self.family.community.log("{} gave birth to {}".format(self.partner.printableFullName(),
+							child.firstName()))
+					self.children.append(child)
+					self.partner.children.append(child)
 
 		# life expectancy is calculated by another random truncated gaussian distribution
 		if self.age > self.lifetime:
@@ -684,6 +710,7 @@ class Person:
 				" is ", " was "))
 			if self.married:
 				toReturn.append("{} was married to {}.".format(self.firstName(), self.partner.printableFullName()))
+			toReturn.append("{} was a parent to {} child(ren)".format(self.firstName(), len(self.children)))
 
 		return "\n".join(toReturn)
 
