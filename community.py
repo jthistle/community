@@ -85,7 +85,6 @@ class Community:
 			# Give enough food for the year
 			tempFamily.food = (10*2 + 6*childrenCount)*4
 
-
 		# Pass time once without increasing the date
 		self.passTime(False)
 
@@ -184,14 +183,18 @@ class Community:
 						if p.likes(b) and b.likes(p):
 							if random.randint(1, DT_CHANCE) == 1 and p.age > DT_MIN_AGE and b.age > DT_MIN_AGE:
 								# deep talk
-								p.updateRapport(b, DT_RAPPORT_GAIN)
-								b.updateRapport(p, DT_RAPPORT_GAIN*INTERACTED_WITH_MOD)
+								p.updateRapport(b,
+									DT_RAPPORT_GAIN*(p.calculateCap(b)/CAP_MODIFIER))
+								b.updateRapport(p,
+									DT_RAPPORT_GAIN*(b.calculateCap(p)/CAP_MODIFIER)*INTERACTED_WITH_MOD)
 								p.log("I had a deep talk with {}".format(b.printableFullName()))
 								b.log("{} had a deep talk with me".format(p.printableFullName()))
 							else:
 								# quick chat
-								p.updateRapport(b, CHAT_RAPPORT_GAIN)
-								b.updateRapport(p, CHAT_RAPPORT_GAIN*INTERACTED_WITH_MOD)
+								p.updateRapport(b,
+									CHAT_RAPPORT_GAIN*(p.calculateCap(b)/CAP_MODIFIER))
+								b.updateRapport(p,
+									CHAT_RAPPORT_GAIN*(b.calculateCap(p)/CAP_MODIFIER)*INTERACTED_WITH_MOD)
 								p.log("I had a quick chat with {}".format(b.printableFullName()))
 								b.log("{} had a quick chat with me".format(p.printableFullName()))
 						else:

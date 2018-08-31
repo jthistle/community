@@ -22,8 +22,8 @@ class Tests:
 			writer = csv.writer(csvFile)
 			writer.writerow(["Cap"])
 			for i in range(10000):
-				f1.generatePerson(None, None, age=80, gender="male")
-				f1.generatePerson(None, None, age=80, gender="female")
+				f1.generatePerson(None, age=80, gender="male")
+				f1.generatePerson(None, age=80, gender="female")
 
 				val1 = f1.getPerson(0).calculateCap(f1.getPerson(1))
 				val2 = f1.getPerson(1).calculateCap(f1.getPerson(0))
@@ -39,8 +39,8 @@ class Tests:
 			writer = csv.writer(csvFile)
 			writer.writerow(["Rom"])
 			for i in range(10000):
-				f1.generatePerson(None, None, age=80, gender="male")
-				f1.generatePerson(None, None, age=80, gender="female")
+				f1.generatePerson(None, age=80, gender="male")
+				f1.generatePerson(None, age=80, gender="female")
 
 				val1 = f1.getPerson(0).calculateRomanticInterest(f1.getPerson(1))
 				val2 = f1.getPerson(1).calculateRomanticInterest(f1.getPerson(0))
@@ -60,8 +60,8 @@ class Tests:
 			writer = csv.writer(csvFile)
 			writer.writerow(["Cap", "Rom"])
 			for i in range(10000):
-				f1.generatePerson(None, None, age=80, gender="male")
-				f1.generatePerson(None, None, age=80, gender="female")
+				f1.generatePerson(None, age=80, gender="male")
+				f1.generatePerson(None, age=80, gender="female")
 
 				val1 = f1.getPerson(0).calculateCap(f1.getPerson(1))
 				val2 = f1.getPerson(1).calculateCap(f1.getPerson(0))
@@ -77,3 +77,4 @@ class Tests:
 if __name__ == "__main__":
 	t = Tests()
 	t.run()
+	t.runCapTests()
