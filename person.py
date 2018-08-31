@@ -132,6 +132,14 @@ class Person:
 		rom = self.calculateCap(b) * (0.5*(b.getAttr("p")-self.getAttr("p"))+1)
 		return rom
 
+	def romanticInterestThreshold(self, b):
+		'''
+		The romantic interest threshold is a function of extroversion, agreableness,
+		and rapport.
+		'''
+		thresh = 5 - 0.5*(self.getAttr("a")+self.getAttr("e")) - 2*self.rapport[b]
+		return thresh
+
 	def likes(self, b):
 		if self.calculateCap(b) >= self.__capCutoff:
 			return True
@@ -199,13 +207,13 @@ class Person:
 
 		toReturn = []
 		if len(bestFriends) > 0:
-			toReturn.append("Best friends with: ".format(self.firstName())
-				+ ", ".join([x.printableFullName() for x in bestFriends]))
+			toReturn.append("Best friends with: ".format(self.firstName()) +
+				", ".join([x.printableFullName() for x in bestFriends]))
 		else:
 			toReturn.append("{} has no best friends".format(self.firstName()))
 		if len(friends) > 0:
-			toReturn.append("Friends with: ".format(self.firstName())
-				+ ", ".join([x.printableFullName() for x in friends]))
+			toReturn.append("Friends with: ".format(self.firstName()) +
+				", ".join([x.printableFullName() for x in friends]))
 		else:
 			toReturn.append("{} has no friends".format(self.firstName()))
 

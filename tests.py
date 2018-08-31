@@ -77,4 +77,3 @@ class Tests:
 if __name__ == "__main__":
 	t = Tests()
 	t.run()
-
