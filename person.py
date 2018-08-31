@@ -211,9 +211,9 @@ class Person:
 			elif rp >= -0.2:
 				return "{} has chatted with {}".format(n1, n2)
 			elif rp >= -0.5:
-				return "{} doesn't really like {}".format(n1, n2)
-			elif rp >= -0.8:
 				return "{} hasn't got on well with {}".format(n1, n2)
+			elif rp >= -0.8:
+				return "{} dislikes {}".format(n1, n2)
 			elif rp >= -1:
 				return "{} despises {}".format(n1, n2)
 		else:
@@ -222,12 +222,15 @@ class Person:
 	def friends(self):
 		bestFriends = []
 		friends = []
-		for p in self.rapport.keys():
+
+		# sort by rapport
+		sortedRapportKeys = sorted(list(self.rapport.keys()), key=lambda x: self.rapport[x], reverse=True)
+		for p in sortedRapportKeys:
 			if p in self.family.people or not p.alive:
 				continue
-			if self.rapport[p] >= 0.8:
+			if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
 				bestFriends.append(p)
-			elif self.rapport[p] >= 0.5:
+			elif self.rapport[p] >= FRIEND_THRESHOLD:
 				friends.append(p)
 
 		toReturn = []
@@ -240,8 +243,7 @@ class Person:
 		if len(friends) > 0:
 			toReturn.append("Friends with: ".format(self.firstName()) +
 				", ".join([x.printableFullName() for x in friends]))
-		else:
-			if len(bestFriends) == 0:
+		elif len(bestFriends) == 0:
 				toReturn.append("{} has no friends".format(self.firstName()))
 
 		return ". ".join(toReturn)

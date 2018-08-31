@@ -55,3 +55,6 @@ MIN_ARGUMENT_AGE = 5*4
 # Modifier applied to rapport if someone else initiated
 # the interaction.
 INTERACTED_WITH_MOD = (2/3)
+
+FRIEND_THRESHOLD = 0.5
+BEST_FRIEND_THRESHOLD = 0.8
