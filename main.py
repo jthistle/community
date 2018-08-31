@@ -81,6 +81,18 @@ class Application(Frame):
 		self.personEventsLabel = Label(self.personInfo, text="Events")
 		self.personEventsLabel.pack(anchor=W, side=BOTTOM)
 
+		self.inspectorBtnFrame = Frame(self.personInfo)
+		self.inspectorBtnFrame.pack(anchor=W, side=BOTTOM, padx=5)
+		self.fatherBtn = Button(self.inspectorBtnFrame, text="Father", command=self.blank)
+		self.fatherBtn.grid(row=0, column=0, sticky=W+E)
+		self.fatherBtn.bind('<Button-1>', self.onRelativeButtonClick)
+		self.motherBtn = Button(self.inspectorBtnFrame, text="Mother", command=self.blank)
+		self.motherBtn.grid(row=0, column=1, sticky=W+E)
+		self.motherBtn.bind('<Button-1>', self.onRelativeButtonClick)
+		self.partnerBtn = Button(self.inspectorBtnFrame, text="Partner", command=self.blank)
+		self.partnerBtn.grid(row=0, column=2, sticky=W+E)
+		self.partnerBtn.bind('<Button-1>', self.onRelativeButtonClick)
+
 		self.eventsLabel = Label(self.restFrame, text="Events")
 		self.eventsLabel.grid(row=2, column=0, sticky=W)
 		self.eventLog = Text(self.restFrame, width=50, height=19, state=DISABLED)
@@ -94,6 +106,7 @@ class Application(Frame):
 		self.familiesList.insert(END, "[Graveyard]")
 		self.updatePeopleList()
 		self.updateMainEventLog()
+		self.updateInspectorButtons()
 
 		if self.viewMode == "inspect":
 			if self.lastInspected == "family":
@@ -125,6 +138,24 @@ class Application(Frame):
 				for p in graveyard:
 					self.peopleList.insert(END, p.printableFullName())
 
+	def updateInspectorButtons(self):
+		partner = self.partnerBtn
+		father = self.fatherBtn
+		mother = self.motherBtn
+
+		partner.config(state=DISABLED)
+		father.config(state=DISABLED)
+		mother.config(state=DISABLED)
+		if self.selectedPerson is not None:
+			p = self.getSelectedPerson()
+			if p:
+				if p.partner is not None:
+					partner.config(state=NORMAL)
+				if p.father():
+					father.config(state=NORMAL)
+				if p.mother():
+					mother.config(state=NORMAL)
+
 	def inspectFamily(self):
 		self.lastInspected = "family"
 		f = self.community.getFamilyByIndex(self.selectedFamily)
@@ -134,6 +165,7 @@ class Application(Frame):
 	def inspectPerson(self):
 		self.lastInspected = "person"
 		if self.selectedPerson is not None:
+			self.updateInspectorButtons()
 			p = self.getSelectedPerson()
 			if p:
 				self.writeToInspector(p.inspect())
@@ -192,6 +224,38 @@ class Application(Frame):
 			self.writeInspectorEvents([])  # clear events panel
 		self.updateWidgets()
 
+	def onRelativeButtonClick(self, evt):
+		p = self.getSelectedPerson()
+		wgt = evt.widget
+		if p:
+			gyard = self.community.graveyard()
+			if wgt == self.fatherBtn and p.father():
+				father = p.father()
+				if father in gyard:
+					self.selectedFamily = len(self.community.families)
+					self.selectedPerson = gyard.index(father)
+				else:
+					self.selectedFamily = self.community.families.index(father.family)
+					self.selectedPerson = father.family.people.index(father)
+			elif wgt == self.motherBtn and p.mother():
+				mother = p.mother()
+				if mother in gyard:
+					self.selectedFamily = len(self.community.families)
+					self.selectedPerson = gyard.index(mother)
+				else:
+					self.selectedFamily = self.community.families.index(mother.family)
+					self.selectedPerson = mother.family.people.index(mother)
+			elif wgt == self.partnerBtn and p.partner is not None:
+				partner = p.partner
+				if partner in gyard:
+					self.selectedFamily = len(self.community.families)
+					self.selectedPerson = gyard.index(partner)
+				else:
+					self.selectedFamily = self.community.families.index(partner.family)
+					self.selectedPerson = partner.family.people.index(partner)
+
+			self.updateWidgets()
+
 	def writeToInspector(self, s):
 		self.personInfoText.config(text=s)
 
@@ -204,15 +268,16 @@ class Application(Frame):
 		self.personEvents.config(state=DISABLED)
 
 	def getSelectedPerson(self):
-		if self.selectedFamily < len(self.community.families):
-			f = self.community.getFamilyByIndex(self.selectedFamily)
-			p = f.getPerson(self.selectedPerson)
-			return p
-		else:
-			# graveyard is selected
-			graveyard = self.community.graveyard()
-			p = graveyard[self.selectedPerson]
-			return p
+		if self.selectedFamily is not None and self.selectedPerson is not None:
+			if self.selectedFamily < len(self.community.families):
+				f = self.community.getFamilyByIndex(self.selectedFamily)
+				p = f.getPerson(self.selectedPerson)
+				return p
+			else:
+				# graveyard is selected
+				graveyard = self.community.graveyard()
+				p = graveyard[self.selectedPerson]
+				return p
 
 	def passTime(self):
 		self.community.passTime()
