@@ -71,7 +71,7 @@ class Community:
 			tempFamily.addPerson(a2)
 
 			# Now generate children
-			childrenCount = random.randint(0, 3)
+			childrenCount = random.randint(2, 4)
 			for i in range(childrenCount):
 				child = tempFamily.generatePerson([a1, a2], age=random.randint(0, 12*4))
 				a1.addChild(child)
@@ -189,6 +189,46 @@ class Community:
 									DT_RAPPORT_GAIN*(b.calculateCap(p)/CAP_MODIFIER)*INTERACTED_WITH_MOD)
 								p.log("I had a deep talk with {}".format(b.printableFullName()))
 								b.log("{} had a deep talk with me".format(p.printableFullName()))
+
+								# For now, this can lead to a partnership
+								# TODO change wording and other stuff for existing partner
+								if p.romanticallyLikes(b) and p.age >= MIN_ASKOUT_AGE\
+									and b.age >= MIN_ASKOUT_AGE and not p.married and not b.married\
+									and b not in p.family.people and p.gender != b.gender\
+									and ((p.timeWithPartner >= 2 and b.timeWithPartner >= 2) or
+										(p.partner is None and b.partner is None)):
+									cont = True
+									# A person will only abandon a partner if the romantic interest
+									# to a new person is higher
+									if p.partner is not None:
+										if p.calculateRomanticInterest(p.partner) >= p.calculateRomanticInterest(b):
+											cont = False
+									if b.partner is not None:
+										if b.calculateRomanticInterest(b.partner) >= b.calculateRomanticInterest(p):
+											cont = False
+
+									if cont:
+										p.log("I asked out {}".format(b.printableFullName()))
+										b.log("{} asked me out".format(p.printableFullName()))
+										if b.romanticallyLikes(p):
+											b.log("I accepted {}'s proposal".format(p.firstName()))
+											p.log("{} accepted my proposal".format(b.firstName()))
+											self.log("{} and {} are now going out".format(p.printableFullName(),
+												b.printableFullName()))
+
+											if b.partner is not None:
+												b.breakUp()
+											if p.partner is not None:
+												p.breakUp()
+
+											b.partner = p
+											p.partner = b
+											b.addModifier(4)
+											p.addModifier(4)
+										else:
+											b.log("I declined {}'s proposal".format(p.firstName()))
+											p.log("{} rebuffed me".format(b.firstName()))
+											p.addModifier(16)  # add rebuffed modifier
 							else:
 								# quick chat
 								p.updateRapport(b,

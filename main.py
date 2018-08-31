@@ -126,8 +126,12 @@ class Application(Frame):
 		self.lastInspected = "person"
 		if self.selectedPerson is not None:
 			p = self.getSelectedPerson()
-			self.writeToInspector(p.inspect())
-			self.writeInspectorEvents(p.eventLog)
+			if p:
+				self.writeToInspector(p.inspect())
+				self.writeInspectorEvents(p.eventLog)
+			else:
+				self.writeToInspector("Select a family to begin")
+				self.writeInspectorEvents([])
 
 	def comparePeople(self):
 		# TODO compare

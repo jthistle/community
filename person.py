@@ -39,6 +39,7 @@ class Person:
 		self.eventLog = []			# stores text log of interactions
 		self.modifiers = {}			# mood modifiers
 		self.rapport = {}			# stores rapport with other people
+		self.timeWithPartner = 0
 
 		# very fatalistic, but generates a lifetime for a person
 		self.lifetime = random.gauss(self.__lifeExpectancy, LIFE_EXPECTANCY_SD)
@@ -61,8 +62,27 @@ class Person:
 		else:
 			self.name = nameGen.full(self.gender)
 
+	def breakUp(self):
+		if self.partner is not None:
+			self.log("I broke up with {}".format(self.partner.printableFullName()))
+			self.partner.log("{} broke up with me".format(self.printableFullName()))
+			self.family.community.log("{} broke up with {}".format(
+				self.printableFullName(), self.partner.printableFullName()))
+			self.addModifier(6)
+			self.partner.addModifier(6)
+			self.partner.partner = None
+			self.partner = None
+
 	def passTime(self):
 		self.age += 1
+		if self.partner is not None and not self.married:
+			self.timeWithPartner += 1
+			# decide whether to break up
+			if self.timeWithPartner >= 2 and not self.romanticallyLikes(self.partner):
+				self.breakUp()
+		else:
+			self.timeWithPartner = 0
+
 		self.log("== {} ==".format(self.ageToString()))
 
 		# life expectancy is calculated by another random truncated gaussian distribution
@@ -145,6 +165,11 @@ class Person:
 			return True
 		return False
 
+	def romanticallyLikes(self, b):
+		if self.calculateRomanticInterest(b) >= self.romanticInterestThreshold(b):
+			return True
+		return False
+
 	def firstName(self):
 		return self.name[0]
 
@@ -210,12 +235,14 @@ class Person:
 			toReturn.append("Best friends with: ".format(self.firstName()) +
 				", ".join([x.printableFullName() for x in bestFriends]))
 		else:
-			toReturn.append("{} has no best friends".format(self.firstName()))
+			if len(friends) > 0:
+				toReturn.append("{} has no best friends".format(self.firstName()))
 		if len(friends) > 0:
 			toReturn.append("Friends with: ".format(self.firstName()) +
 				", ".join([x.printableFullName() for x in friends]))
 		else:
-			toReturn.append("{} has no friends".format(self.firstName()))
+			if len(bestFriends) == 0:
+				toReturn.append("{} has no friends".format(self.firstName()))
 
 		return ". ".join(toReturn)
 
@@ -578,6 +605,11 @@ class Person:
 		toReturn.append(self.attributesAsDescription()+" "+self.otherAttributesAsDescription())
 		toReturn.append("{} is feeling {} {}.".format(self.firstName(), self.oneWordMood(), self.moodReasons()))
 		toReturn.append("{}.".format(self.friends()))
+		if self.married:
+			toReturn.append("{} is married to {}.".format(self.firstName(), self.partner.printableFullName()))
+		elif self.partner is not None:
+			toReturn.append("{} has been going out with {} for {} seasons.".format(
+				self.firstName(), self.partner.printableFullName(), self.timeWithPartner))
 
 		return "\n".join(toReturn)
 
