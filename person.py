@@ -190,6 +190,8 @@ class Person:
 		bestFriends = []
 		friends = []
 		for p in self.rapport.keys():
+			if p in self.family.people or not p.alive:
+				continue
 			if self.rapport[p] >= 0.8:
 				bestFriends.append(p)
 			elif self.rapport[p] >= 0.5:
@@ -197,17 +199,17 @@ class Person:
 
 		toReturn = []
 		if len(bestFriends) > 0:
-			toReturn.append("best friends with: ".format(self.firstName()))
-			toReturn = toReturn + [x.printableFullName() for x in bestFriends]
+			toReturn.append("Best friends with: ".format(self.firstName())
+				+ ", ".join([x.printableFullName() for x in bestFriends]))
 		else:
 			toReturn.append("{} has no best friends".format(self.firstName()))
 		if len(friends) > 0:
-			toReturn.append("friends with: ".format(self.firstName()))
-			toReturn = toReturn + [x.printableFullName() for x in friends]
+			toReturn.append("Friends with: ".format(self.firstName())
+				+ ", ".join([x.printableFullName() for x in friends]))
 		else:
 			toReturn.append("{} has no friends".format(self.firstName()))
 
-		return "\n".join(toReturn)
+		return ". ".join(toReturn)
 
 	def getMood(self):
 		tempMood = self.baseMood()
@@ -234,6 +236,16 @@ class Person:
 			return "bad"
 		elif self.getMood() >= -2:
 			return "suicidal"
+
+	def moodReasons(self):
+		toReturn = []
+		if len(self.modifiers) == 0:
+			return "for no reason in particular"
+
+		for m in self.modifiers:
+			toReturn.append(self.modifiers[m][0].lower())
+
+		return "for these reasons: "+", ".join(toReturn)
 
 	def addChild(self, p):
 		if p not in self.children:
@@ -556,7 +568,8 @@ class Person:
 		toReturn.append("Aged {}".format(self.ageToString()))
 		toReturn.append("Gender {}".format(self.gender))
 		toReturn.append(self.attributesAsDescription()+" "+self.otherAttributesAsDescription())
-		toReturn.append("{} is feeling {}.".format(self.firstName(), self.oneWordMood()))
+		toReturn.append("{} is feeling {} {}.".format(self.firstName(), self.oneWordMood(), self.moodReasons()))
+		toReturn.append("{}.".format(self.friends()))
 
 		return "\n".join(toReturn)
 

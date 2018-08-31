@@ -80,7 +80,7 @@ class Application(Frame):
 
 		self.eventsLabel = Label(self.restFrame, text="Events")
 		self.eventsLabel.grid(row=2, column=0, sticky=W)
-		self.eventLog = Text(self.restFrame, width=50, height=13, state=DISABLED)
+		self.eventLog = Text(self.restFrame, width=50, height=19, state=DISABLED)
 		self.eventLog.grid(row=3, column=0, columnspan=2, sticky=N+E+W+S, padx=5)
 
 	def updateWidgets(self):
@@ -204,7 +204,7 @@ class Application(Frame):
 
 if __name__ == "__main__":
 	root = Tk()
-	root.geometry("800x500")
+	root.geometry("800x600")
 	root.resizable(0, 0)
 	app = Application(master=root)
 	app.mainloop()
