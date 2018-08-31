@@ -70,6 +70,8 @@ class Person:
 				self.printableFullName(), self.partner.printableFullName()))
 			self.addModifier(6)
 			self.partner.addModifier(6)
+			self.timeWithPartner = 0
+			self.partner.timeWithPartner = 0
 			self.partner.partner = None
 			self.partner = None
 
@@ -613,19 +615,27 @@ class Person:
 		'''
 		toReturn = []
 		toReturn.append("== {} ==".format(self.printableFullName()))
-		toReturn.append("Aged {}".format(self.ageToString()))
-		toReturn.append("Gender {}".format(self.gender))
-		toReturn.append(self.attributesAsDescription()+" "+self.otherAttributesAsDescription())
-		toReturn.append("{} is feeling {} {}.".format(self.firstName(), self.oneWordMood(), self.moodReasons()))
-		toReturn.append("{}.".format(self.friends()))
-		if self.married:
-			if self.partner.alive:
-				toReturn.append("{} is married to {}.".format(self.firstName(), self.partner.printableFullName()))
-			else:
-				toReturn.append("{} is a widow(er).".format(self.firstName()))
-		elif self.partner is not None:
-			toReturn.append("{} has been going out with {} for {} seasons.".format(
-				self.firstName(), self.partner.printableFullName(), self.timeWithPartner))
+		if self.alive:
+			toReturn.append("Aged {}".format(self.ageToString()))
+			toReturn.append("Gender {}".format(self.gender))
+			toReturn.append(self.attributesAsDescription()+" "+self.otherAttributesAsDescription())
+			toReturn.append("{} is feeling {} {}.".format(self.firstName(), self.oneWordMood(), self.moodReasons()))
+			toReturn.append("{}.".format(self.friends()))
+			if self.married:
+				if self.partner.alive:
+					toReturn.append("{} is married to {}.".format(self.firstName(), self.partner.printableFullName()))
+				else:
+					toReturn.append("{} is a widow(er).".format(self.firstName()))
+			elif self.partner is not None:
+				toReturn.append("{} has been going out with {} for {} seasons.".format(
+					self.firstName(), self.partner.printableFullName(), self.timeWithPartner))
+		else:
+			toReturn.append("Died aged {}".format(self.ageToString()))
+			toReturn.append("Gender {}".format(self.gender))
+			toReturn.append((self.attributesAsDescription()+" "+self.otherAttributesAsDescription()).replace(
+				" is ", " was "))
+			if self.married:
+				toReturn.append("{} was married to {}.".format(self.firstName(), self.partner.printableFullName()))
 
 		return "\n".join(toReturn)
 

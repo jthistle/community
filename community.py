@@ -114,11 +114,14 @@ class Community:
 		return tempP
 
 	def passTime(self, autoDateIncrease=True):
-		# TODO
-		# Family pass time
-		# Harsh winter, other events
-		# Social interactions
-		# People actions based on final mood and events during social interactions
+		'''
+		Passes time, updating things in this order:
+			1. Increase date
+			2. Update moods (remove expired modifiers)
+			3. Decide season events
+			4. Pass time in families (subroutine)
+			5. Social interactions including on-the-fly mood changes
+		'''
 
 		if autoDateIncrease:
 			self.date += 1

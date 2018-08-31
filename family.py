@@ -119,9 +119,6 @@ class Family:
 			else:
 				adults += 1
 			p.passTime()
-			if not p.alive:
-				self.removePerson(p)
-				self.deadPeople.append(p)
 
 		if len(self.people) == 0:
 			print("The house of the {} family is deserted.".format(self.familyName))

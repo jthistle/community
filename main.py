@@ -91,6 +91,7 @@ class Application(Frame):
 		self.familiesList.delete(0, END)
 		for f in self.community.families:
 			self.familiesList.insert(END, f.familyName)
+		self.familiesList.insert(END, "Graveyard")
 		self.updatePeopleList()
 		self.updateMainEventLog()
 
@@ -115,9 +116,14 @@ class Application(Frame):
 	def updatePeopleList(self):
 		self.peopleList.delete(0, END)
 		if self.selectedFamily is not None:
-			f = self.community.getFamilyByIndex(self.selectedFamily)
-			for p in f.people:
-				self.peopleList.insert(END, p.firstName())
+			if self.selectedFamily < len(self.community.families):
+				f = self.community.getFamilyByIndex(self.selectedFamily)
+				for p in f.people:
+					self.peopleList.insert(END, p.firstName())
+			else:
+				graveyard = self.community.graveyard()
+				for p in graveyard:
+					self.peopleList.insert(END, p.printableFullName())
 
 	def inspectFamily(self):
 		self.lastInspected = "family"
@@ -156,10 +162,12 @@ class Application(Frame):
 			self.selectedFamily = ind
 			self.updatePeopleList()
 
-			if self.viewMode == "inspect":
-				self.inspectFamily()
-			elif self.viewMode == "compare":
-				None
+			# check if graveyard selected
+			if ind < len(self.community.families):
+				if self.viewMode == "inspect":
+					self.inspectFamily()
+				elif self.viewMode == "compare":
+					None
 
 	def onPeopleLbChange(self, evt):
 		if len(self.peopleList.curselection()) > 0:
@@ -196,9 +204,15 @@ class Application(Frame):
 		self.personEvents.config(state=DISABLED)
 
 	def getSelectedPerson(self):
-		f = self.community.getFamilyByIndex(self.selectedFamily)
-		p = f.getPerson(self.selectedPerson)
-		return p
+		if self.selectedFamily < len(self.community.families):
+			f = self.community.getFamilyByIndex(self.selectedFamily)
+			p = f.getPerson(self.selectedPerson)
+			return p
+		else:
+			# graveyard is selected
+			graveyard = self.community.graveyard()
+			p = graveyard[self.selectedPerson]
+			return p
 
 	def passTime(self):
 		self.community.passTime()
