@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
+from tkinter import filedialog
 from tkinter import *
 import random
 import math
 import sys
+import os
+import pickle
 from person import Person
 from family import Family
 from community import Community
@@ -33,9 +36,9 @@ class Application(Frame):
 
 		self.passTimeBtn = Button(self.btnFrame, text="Pass time", command=self.passTime)
 		self.passTimeBtn.grid(row=0, column=0, sticky=E+W)
-		self.saveBtn = Button(self.btnFrame, text="Save", command=self.blank)
+		self.saveBtn = Button(self.btnFrame, text="Save", command=self.save)
 		self.saveBtn.grid(row=0, column=1, sticky=E+W)
-		self.loadBtn = Button(self.btnFrame, text="Load", command=self.blank)
+		self.loadBtn = Button(self.btnFrame, text="Load", command=self.load)
 		self.loadBtn.grid(row=0, column=2, sticky=E+W)
 		self.exitBtn = Button(self.btnFrame, text="Exit", command=root.destroy)
 		self.exitBtn.grid(row=0, column=3, sticky=E+W)
@@ -200,6 +203,33 @@ class Application(Frame):
 	def passTime(self):
 		self.community.passTime()
 		self.updateWidgets()
+
+	def save(self):
+		cwd = os.path.dirname(os.path.realpath(__file__))
+		filename = filedialog.asksaveasfilename(initialdir=cwd, title="Select file",
+			filetypes=(("Community save file", "*.cmu"), ("all files", "*.*")))
+		if filename:
+			with open(filename, "wb") as file:
+				try:
+					pickle.dump(self.community, file)
+				except Exception as e:
+					print("An error occurred: {}".format(e))
+
+	def load(self):
+		cwd = os.path.dirname(os.path.realpath(__file__))
+		filename = filedialog.askopenfilename(initialdir=cwd, title="Select file",
+			filetypes=(("Community save file", "*.cmu"), ("all files", "*.*")))
+		if filename:
+			with open(filename, "rb") as file:
+				try:
+					tempCom = pickle.load(file)
+					if isinstance(tempCom, Community):
+						self.community = tempCom
+						self.updateWidgets()
+					else:
+						raise Exception("Could not decode community from save file")
+				except Exception as e:
+					print("An error occurred: {}".format(e))
 
 	def blank(self):
 		'Placeholder function'
