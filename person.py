@@ -133,7 +133,7 @@ class Person:
 				lowestAge = 4
 
 			if lowestAge > 3 and\
-				len(self.children) < BABY_MAX_AMOUNT\
+				len(self.children) < BABY_MAX_AMOUNT and\
 				self.romanticallyLikes(self.partner) and self.partner.romanticallyLikes(self):
 				if random.randint(1, BASE_BABY_CHANCE*(len(self.children)+1)) == 1:
 					child = self.family.generatePerson([self, self.partner])
@@ -154,6 +154,18 @@ class Person:
 		if self.age > self.lifetime:
 			self.die()
 			return True
+
+		if self.partner is None:
+			friends = self.countFriends()
+			if friends[0] <= MAX_ARMY_BEST_FRIENDS and friends[1] <= MAX_ARMY_FRIENDS and\
+				self.age >= MIN_ARMY_AGE and self.age <= MAX_ARMY_AGE and self.gender == "male":
+				# Whether someone wants to join the army is a function of conscientiousness
+				armyChance = 10*(BASE_ARMY_CHANCE - self.getAttr("c")*2)
+				if random.randint(1, math.ceil(armyChance)) <= 10:
+					self.log("I left the community to join the army")
+					self.family.community.log("{} has left the community to join the army at the age of {}".format(
+						self.printableFullName(), self.ageToString()))
+					self.family.removePerson(self)
 
 		# mood level at which someone will commit suicide is currently
 		# TODO Could be a function of something in future?
@@ -326,6 +338,23 @@ class Person:
 				toReturn.append("{} has no friends".format(self.firstName()))
 
 		return ". ".join(toReturn)
+
+	def countFriends(self):
+		'''
+		Returns [friends, best friends]
+		'''
+		bestFriends = 0
+		friends = 0
+
+		for p in self.rapport.keys():
+			if self.isRelative(p) or not p.alive:
+				continue
+			if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
+				bestFriends += 1
+			elif self.rapport[p] >= FRIEND_THRESHOLD:
+				friends += 1
+
+		return [bestFriends, friends]
 
 	def getMood(self):
 		tempMood = self.baseMood()
