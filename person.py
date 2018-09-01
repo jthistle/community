@@ -122,7 +122,7 @@ class Person:
 		else:
 			self.timeWithPartner = 0
 
-		if self.married:
+		if self.married and self.partner.alive:
 			# Decide whether to have baby, but only if married, and both people
 			# still are attracted to each other. Chance of baby decreases with number of
 			# children.
@@ -133,7 +133,7 @@ class Person:
 				lowestAge = 4
 
 			if lowestAge > 3 and\
-				len(self.children) < BABY_MAX_AMOUNT and\
+				len(self.children) < BABY_MAX_AMOUNT\
 				self.romanticallyLikes(self.partner) and self.partner.romanticallyLikes(self):
 				if random.randint(1, BASE_BABY_CHANCE*(len(self.children)+1)) == 1:
 					child = self.family.generatePerson([self, self.partner])
@@ -147,6 +147,8 @@ class Person:
 							child.firstName()))
 					self.children.append(child)
 					self.partner.children.append(child)
+					self.addModifier(15)
+					self.partner.addModifier(15)
 
 		# life expectancy is calculated by another random truncated gaussian distribution
 		if self.age > self.lifetime:
@@ -157,14 +159,15 @@ class Person:
 		# TODO Could be a function of something in future?
 		suicideLevel = SUICIDE_MIN_MOOD_LEVEL
 		if self.getMood() <= suicideLevel and not self.isChild():
-			print("{} attempted suicide".format(self.firstName()))
+			self.family.community.log("{} attempted suicide".format(self.firstName()))
+			self.log("I attempted suicide")
 			self.die()  # TODO - maybe not every time
-		elif self.getMood() <= -1.5:
-			print("feeling very bad".format(self.firstName()))
-		elif self.getMood() > 1.5:
-			print("feeling really good".format(self.firstName()))
+		elif self.getMood() <= -1.3:
+			self.log("I'm feeling very bad")
+		elif self.getMood() > 1.3:
+			self.log("I'm feeling really good")
 		elif self.getMood() > 2:
-			print("feeling euphoric".format(self.firstName()))
+			self.log("I'm feeling euphoric")
 
 		# Rapport decays towards 0 by a set value per season
 		for r in self.rapport.keys():

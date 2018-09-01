@@ -69,22 +69,17 @@ class Family:
 			if p.parents[0] is not None:
 				for i in p.parents:
 					i.addModifier(8)
-					print("debug child died")
 				for i in p.parents[0].children:
 					if i != p:
 						i.addModifier(9)
-						print("debug sibling died")
 
 			for i in p.children:
 				i.addModifier(7)
-				print("debug parent died")
 			if p.partner is not None:
 				if p.married:
 					p.partner.addModifier(11)
-					print("debug husb/wife died")
 				else:
 					p.partner.addModifier(10)
-					print("debug partner died")
 					p.partner.partner = None
 					p.partner = None
 
@@ -123,10 +118,6 @@ class Family:
 			else:
 				adults += 1
 			p.passTime()
-
-		if len(self.people) == 0:
-			print("The house of the {} family is deserted.".format(self.familyName))
-			return
 
 		# This flag decides if the good harvest modifier is set or not
 		goodHarvest = False

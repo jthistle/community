@@ -164,9 +164,14 @@ class Application(Frame):
 
 	def inspectFamily(self):
 		self.lastInspected = "family"
-		f = self.community.getFamilyByIndex(self.selectedFamily)
-		self.writeToInspector(f.inspect())
-		self.writeInspectorEvents(f.eventLog)
+		if self.selectedFamily < len(self.community.families):
+			f = self.community.getFamilyByIndex(self.selectedFamily)
+			self.writeToInspector(f.inspect())
+			self.writeInspectorEvents(f.eventLog)
+		else:
+			self.writeToInspector("== The GRAVEYARD ==\n" +
+				"The graveyard holds the memories of all souls that have passed through the community.")
+			self.writeInspectorEvents("")
 
 	def inspectPerson(self):
 		self.lastInspected = "person"
@@ -201,12 +206,10 @@ class Application(Frame):
 			self.selectedPerson = None
 			self.updatePeopleList()
 
-			# check if graveyard selected
-			if ind < len(self.community.families):
-				if self.viewMode == "inspect":
-					self.inspectFamily()
-				elif self.viewMode == "compare":
-					None
+			if self.viewMode == "inspect":
+				self.inspectFamily()
+			elif self.viewMode == "compare":
+				None
 
 	def onPeopleLbChange(self, evt):
 		if len(self.peopleList.curselection()) > 0:

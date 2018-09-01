@@ -120,6 +120,9 @@ class Community:
 		for f in self.families:
 			for p in f.deadPeople:
 				tempP.append(p)
+		for f in self.deadFamilies:
+			for p in f.deadPeople:
+				tempP.append(p)
 
 		return tempP
 
@@ -158,8 +161,8 @@ class Community:
 				self.log("The old house of the {} family is left deserted".format(f.familyName))
 				self.removeFamily(f)
 				self.deadFamilies.append(f)
-
-			f.passTime(self.date%4, self.harshWinter)
+			else:
+				f.passTime(self.date%4, self.harshWinter)
 
 		for p in self.allPeople(minAge=START_INTERACTION_MIN_AGE):
 			# A person interacts with 0-10 people per day, based on extroversion
