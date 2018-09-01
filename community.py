@@ -2,6 +2,7 @@
 
 import random
 import math
+from namegen import NameGen
 from family import Family
 from person import Person
 from moods import MOODS
@@ -154,6 +155,20 @@ class Community:
 					p.addModifier(12)  # add 'cold' modifier
 			else:
 				self.harshWinter = False
+
+		# Decide whether to trigger 'invading army' event
+		if len(self.families) > COMMUNITY_FAMILY_LIMIT and COMMUNITY_FAMILY_LIMIT != 0:
+			namegen = NameGen()
+			factionName = namegen.factionName()
+			self.log("An invading army, {}, is passing through the community".format(factionName))
+			for i in range(ATTACK_KILL_AMOUNT):
+				fInd = random.randint(0, len(self.families)-1)
+				f = self.families[fInd]
+				self.log("The {} family is wiped out by the attack".format(f.familyName))
+				for p in f.people:
+					p.die()
+				self.removeFamily(f)
+				self.deadFamilies.append(f)
 
 		for f in self.families:
 			if len(f.people) == 0:

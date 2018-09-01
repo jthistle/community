@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import names
+import random
 
 
 class NameGen():
@@ -18,3 +19,7 @@ class NameGen():
 
 	def last(self):
 		return names.get_last_name()
+
+	def factionName(self):
+		formatStrs = ["The Legion of {}", "The Brothers of {}", "The Band of {}", "{}'s warriors", "The {} Squadron"]
+		return random.choice(formatStrs).format(names.get_last_name())

@@ -86,23 +86,19 @@ class Person:
 			self.addModifier(5)
 			self.partner.addModifier(5)
 
-			# Change name and create new family
-			if self.gender == "female":
-				self.name[1] = self.partner.name[1]
-			else:
-				self.partner.name[1] = self.name[1]
-
-			newFamily = self.family.community.newFamily(familyName=self.surname())
+			# Create new family
+			# The family name is not carried over to prevent confusion
+			newFamily = self.family.community.newFamily()
 			self.family.removePerson(self)
 			self.partner.family.removePerson(self.partner)
 
 			self.family = newFamily
 			self.partner.family = newFamily
-			newFamily.addPerson(self, preserveSurname=True)
-			newFamily.addPerson(self.partner, preserveSurname=True)
+			newFamily.addPerson(self)
+			newFamily.addPerson(self.partner)
 
-			self.family.community.log("The couple have established a family of {}s".format(
-				self.family.profession))
+			self.family.community.log("The couple have taken the new name of the {} family of {}s".format(
+				self.family.familyName, self.family.profession))
 
 	def passTime(self):
 		self.age += 1
@@ -160,8 +156,9 @@ class Person:
 			if friends[0] <= MAX_ARMY_BEST_FRIENDS and friends[1] <= MAX_ARMY_FRIENDS and\
 				self.age >= MIN_ARMY_AGE and self.age <= MAX_ARMY_AGE and self.gender == "male":
 				# Whether someone wants to join the army is a function of conscientiousness
-				armyChance = 10*(BASE_ARMY_CHANCE - self.getAttr("c")*2)
-				if random.randint(1, math.ceil(armyChance)) <= 10:
+				multiplier = 10
+				armyChance = multiplier*(BASE_ARMY_CHANCE - self.getAttr("c")*2)
+				if random.randint(1, math.ceil(armyChance)) <= multiplier:
 					self.log("I left the community to join the army")
 					self.family.community.log("{} has left the community to join the army at the age of {}".format(
 						self.printableFullName(), self.ageToString()))
