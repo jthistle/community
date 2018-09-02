@@ -44,13 +44,10 @@ class Application(Frame):
 		self.exitBtn.grid(row=0, column=3, sticky=E+W)
 		self.dateLabel = Label(self.btnFrame, text="")
 		self.dateLabel.grid(row=0, column=4, sticky=E+W, padx=10)
-		self.inspectBtn = Button(self.btnFrame, text="Inspect", command=self.blank)
+		self.inspectBtn = Button(self.btnFrame, text="Inspect", command=self.onInspectBtnClick)
 		self.inspectBtn.grid(row=0, column=5, sticky=E+W)
-		self.inspectBtn.bind('<Button-1>', self.onInspectBtnClick)
-		self.compareBtn = Button(self.btnFrame, text="Compare", command=self.blank)
+		self.compareBtn = Button(self.btnFrame, text="Compare", command=self.onCompareBtnClick)
 		self.compareBtn.grid(row=0, column=6, sticky=E+W)
-		self.compareBtn.bind('<Button-1>', self.onCompareBtnClick)
-
 		self.restFrame = Frame()
 		self.restFrame.pack(fill=X)
 		self.restFrame.grid_columnconfigure(0, minsize=5, weight=0)
@@ -92,6 +89,8 @@ class Application(Frame):
 		self.partnerBtn = Button(self.inspectorBtnFrame, text="Partner", command=self.blank)
 		self.partnerBtn.grid(row=0, column=2, sticky=W+E)
 		self.partnerBtn.bind('<Button-1>', self.onRelativeButtonClick)
+		self.familyTreeBtn = Button(self.inspectorBtnFrame, text="Family Tree", command=self.familyTreeWindow)
+		self.familyTreeBtn.grid(row=0, column=3, sticky=W+E)
 
 		self.eventsLabel = Label(self.restFrame, text="Events")
 		self.eventsLabel.grid(row=2, column=0, sticky=W)
@@ -148,10 +147,12 @@ class Application(Frame):
 		partner = self.partnerBtn
 		father = self.fatherBtn
 		mother = self.motherBtn
+		tree = self.familyTreeBtn
 
 		partner.config(state=DISABLED)
 		father.config(state=DISABLED)
 		mother.config(state=DISABLED)
+		tree.config(state=DISABLED)
 		if self.selectedPerson is not None:
 			p = self.getSelectedPerson()
 			if p:
@@ -161,6 +162,7 @@ class Application(Frame):
 					father.config(state=NORMAL)
 				if p.mother():
 					mother.config(state=NORMAL)
+				tree.config(state=NORMAL)
 
 	def inspectFamily(self):
 		self.lastInspected = "family"
@@ -221,12 +223,12 @@ class Application(Frame):
 			elif self.viewMode == "compare":
 				self.comparePeople()
 
-	def onInspectBtnClick(self, evt):
+	def onInspectBtnClick(self):
 		self.viewMode = "inspect"
 		self.comparePerson = None
 		self.updateWidgets()
 
-	def onCompareBtnClick(self, evt):
+	def onCompareBtnClick(self):
 		if self.selectedPerson is not None and self.lastInspected == "person":
 			self.viewMode = "compare"
 			self.comparePerson = self.getSelectedPerson()
@@ -322,9 +324,127 @@ class Application(Frame):
 				except Exception as e:
 					print("An error occurred: {}".format(e))
 
+	def familyTreeWindow(self):
+		w = Toplevel(self)
+		w.geometry("600x400")
+		w.resizable(0, 0)
+		w.wm_attributes("-topmost", 1)
+		w.grab_set()
+		w.main = FamilyTree(w, self.getSelectedPerson())
+		w.main.pack(fill=BOTH)
+
 	def blank(self):
 		'Placeholder function'
 		None
+
+
+class FamilyTree(Frame):
+	def __init__(self, master=None, person=None):
+		super().__init__(master)
+		self.master = master
+		self.person = person
+		self.pack()
+		self.createWidgets()
+		self.updateWidgets()
+
+	def createWidgets(self):
+		self.topbarFrame = Frame(self)
+		self.topbarFrame.pack(fill=X)
+		self.exitBtn = Button(self.topbarFrame, text="Close family tree", command=self.closeWindow)
+		self.exitBtn.pack(side=LEFT)
+
+		self.treeFrame = Frame(self)
+		self.treeFrame.pack(fill=X)
+		self.treeFrame.grid_columnconfigure(0, weight=1)
+		self.treeFrame.grid_columnconfigure(1, weight=1)
+		self.treeFrame.grid_columnconfigure(2, weight=1)
+
+		self.parentsLabel = Label(self.treeFrame, text="Parents")
+		self.parentsLabel.grid(row=0, column=0)
+		self.parentsLb = Listbox(self.treeFrame)
+		self.parentsLb.grid(row=1, column=0)
+		self.parentsLb.bind('<<ListboxSelect>>', self.onParentsLbChange)
+
+		self.siblingsLabel = Label(self.treeFrame, text="Siblings")
+		self.siblingsLabel.grid(row=0, column=1)
+		self.siblingsLb = Listbox(self.treeFrame, exportselection=False)
+		self.siblingsLb.grid(row=1, column=1)
+		self.siblingsLb.bind('<<ListboxSelect>>', self.onSiblingsLbChange)
+
+		self.childrenLabel = Label(self.treeFrame, text="Children")
+		self.childrenLabel.grid(row=0, column=2)
+		self.childrenLb = Listbox(self.treeFrame)
+		self.childrenLb.grid(row=1, column=2)
+		self.childrenLb.bind('<<ListboxSelect>>', self.onChildrenLbChange)
+
+	def updateWidgets(self):
+		self.parentsLb.delete(0, END)
+		if self.person.parents[0] is not None:
+			for p in self.person.parents:
+				toAppend = ""
+				if not p.alive:
+					toAppend = " (d.)"
+				self.parentsLb.insert(END, p.printableFullName()+toAppend)
+
+		self.siblingsLb.delete(0, END)
+		toAppend = ""
+		if not self.person.alive:
+			toAppend = " (d.)"
+		self.siblingsLb.insert(END, self.person.printableFullName()+toAppend)
+		if self.person.married:
+			toAppend = ""
+			if not self.person.partner.alive:
+				toAppend = " (d.)"
+			self.siblingsLb.insert(END, "↳ (m) "+self.person.partner.printableFullName()+toAppend)
+
+		if self.person.parents[0] is not None:
+			siblings = self.person.parents[0].children
+			for p in siblings:
+				if p == self.person:
+					continue
+				toAppend = ""
+				if not p.alive:
+					toAppend = " (d.)"
+				self.siblingsLb.insert(END, p.printableFullName()+toAppend)
+		self.siblingsLb.selection_set(0)
+
+		self.childrenLb.delete(0, END)
+		for p in self.person.children:
+			toAppend = ""
+			if not p.alive:
+				toAppend = " (d.)"
+			self.childrenLb.insert(END, p.printableFullName()+toAppend)
+
+	def onParentsLbChange(self, evt):
+		if len(self.parentsLb.curselection()) > 0:
+			ind = int(self.parentsLb.curselection()[0])
+			self.person = self.person.parents[ind]
+			self.updateWidgets()
+
+	def onSiblingsLbChange(self, evt):
+		if len(self.siblingsLb.curselection()) > 0:
+			ind = int(self.siblingsLb.curselection()[0])
+			indexDiff = 1
+			if self.person.married:
+				if ind == 1:
+					self.person = self.person.partner
+				indexDiff = 2
+
+			if ind > indexDiff-1:
+				siblings = self.person.parents[0].children.copy()
+				siblings.remove(self.person)
+				self.person = siblings[ind-indexDiff]
+			self.updateWidgets()
+
+	def onChildrenLbChange(self, evt):
+		if len(self.childrenLb.curselection()) > 0:
+			ind = int(self.childrenLb.curselection()[0])
+			self.person = self.person.children[ind]
+			self.updateWidgets()
+
+	def closeWindow(self):
+		self.master.grab_release()
+		self.master.destroy()
 
 
 if __name__ == "__main__":

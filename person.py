@@ -124,7 +124,7 @@ class Person:
 			# children.
 			# probably a bad way to find lowest age
 			if len(self.children) > 0:
-				lowestAge = self.children[len(self.children)-1].age
+				lowestAge = self.children[-1].age
 			else:
 				lowestAge = 4
 
