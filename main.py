@@ -388,7 +388,7 @@ class FamilyTree(Frame):
 				toAppend = ""
 				if not p.alive:
 					toAppend = toAppend+" (d.)"
-				if not p in p.family.people:
+				if p not in p.family.people:
 					toAppend = toAppend+" (l.)"
 				self.parentsLb.insert(END, p.printableFullName()+toAppend)
 
@@ -396,14 +396,14 @@ class FamilyTree(Frame):
 		toAppend = ""
 		if not self.person.alive:
 			toAppend = toAppend+" (d.)"
-		if not self in self.family.people:
+		if self not in self.family.people:
 			toAppend = toAppend+" (l.)"
 		self.siblingsLb.insert(END, self.person.printableFullName()+toAppend)
 		if self.person.married:
 			toAppend = ""
 			if not self.person.partner.alive:
 				toAppend = toAppend+" (d.)"
-			if not self.person.partner in self.person.partner.family.people:
+			if self.person.partner not in self.person.partner.family.people:
 				toAppend = toAppend+" (l.)"
 			self.siblingsLb.insert(END, "↳ (m) "+self.person.partner.printableFullName()+toAppend)
 
@@ -415,7 +415,7 @@ class FamilyTree(Frame):
 				toAppend = ""
 				if not p.alive:
 					toAppend = toAppend+" (d.)"
-				if not p in p.family.people:
+				if p not in p.family.people:
 					toAppend = toAppend+" (l.)"
 				self.siblingsLb.insert(END, p.printableFullName()+toAppend)
 		self.siblingsLb.selection_set(0)
@@ -425,7 +425,7 @@ class FamilyTree(Frame):
 			toAppend = ""
 			if not p.alive:
 				toAppend = toAppend+" (d.)"
-			if not p in p.family.people:
+			if p not in p.family.people:
 				toAppend = toAppend+" (l.)"
 			self.childrenLb.insert(END, p.printableFullName()+toAppend)
 
