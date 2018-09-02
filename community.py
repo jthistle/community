@@ -133,7 +133,7 @@ class Community:
 			1. Increase date
 			2. Update moods (remove expired modifiers)
 			3. Decide season events
-			4. Pass time in families (subroutine)
+			4. Pass time in families (subroutine).
 			5. Social interactions including on-the-fly mood changes
 		'''
 
