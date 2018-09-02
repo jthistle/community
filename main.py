@@ -378,23 +378,33 @@ class FamilyTree(Frame):
 		self.childrenLb.bind('<<ListboxSelect>>', self.onChildrenLbChange)
 
 	def updateWidgets(self):
+		'''
+		(d.) denotes that someone's dead
+		(l.) denotes that they've left to join the army
+		'''
 		self.parentsLb.delete(0, END)
 		if self.person.parents[0] is not None:
 			for p in self.person.parents:
 				toAppend = ""
 				if not p.alive:
-					toAppend = " (d.)"
+					toAppend = toAppend+" (d.)"
+				if not p in p.family.people:
+					toAppend = toAppend+" (l.)"
 				self.parentsLb.insert(END, p.printableFullName()+toAppend)
 
 		self.siblingsLb.delete(0, END)
 		toAppend = ""
 		if not self.person.alive:
-			toAppend = " (d.)"
+			toAppend = toAppend+" (d.)"
+		if not self in self.family.people:
+			toAppend = toAppend+" (l.)"
 		self.siblingsLb.insert(END, self.person.printableFullName()+toAppend)
 		if self.person.married:
 			toAppend = ""
 			if not self.person.partner.alive:
-				toAppend = " (d.)"
+				toAppend = toAppend+" (d.)"
+			if not self.person.partner in self.person.partner.family.people:
+				toAppend = toAppend+" (l.)"
 			self.siblingsLb.insert(END, "↳ (m) "+self.person.partner.printableFullName()+toAppend)
 
 		if self.person.parents[0] is not None:
@@ -404,7 +414,9 @@ class FamilyTree(Frame):
 					continue
 				toAppend = ""
 				if not p.alive:
-					toAppend = " (d.)"
+					toAppend = toAppend+" (d.)"
+				if not p in p.family.people:
+					toAppend = toAppend+" (l.)"
 				self.siblingsLb.insert(END, p.printableFullName()+toAppend)
 		self.siblingsLb.selection_set(0)
 
@@ -412,7 +424,9 @@ class FamilyTree(Frame):
 		for p in self.person.children:
 			toAppend = ""
 			if not p.alive:
-				toAppend = " (d.)"
+				toAppend = toAppend+" (d.)"
+			if not p in p.family.people:
+				toAppend = toAppend+" (l.)"
 			self.childrenLb.insert(END, p.printableFullName()+toAppend)
 
 	def onParentsLbChange(self, evt):
