@@ -267,6 +267,9 @@ class Person:
 	def printableFullName(self):
 		return "{} {}".format(self.name[0], self.name[1])
 
+	def setFirstName(self, s):
+		self.name[0] = s
+
 	def setSurname(self, s):
 		self.name[1] = s
 

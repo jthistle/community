@@ -34,7 +34,26 @@ class Family:
 
 	def generatePerson(self, parents, gender="", age=0):
 		newP = Person(parents, gender=gender, surname=self.familyName, age=age)
-		# TODO: if name is the same, add a II, if that's taken, then a III etc.
+
+		numerals = ["II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV",
+			"XV", "XVI", "XVII", "XVIII", "XIX", "XX"]
+		highest = -2
+		for p in self.people:
+			if len(p.firstName().split(" ")) == 1:
+				firstbit = p.firstName()
+			else:
+				firstbit = " ".join(p.firstName().split(" ")[:-1])
+
+			lastbit = p.firstName().split(" ")[-1]
+			if firstbit == newP.firstName():
+				if lastbit in numerals:
+					if numerals.index(lastbit) > highest:
+						highest = numerals.index(lastbit)
+				elif highest == -2:
+					highest = -1
+
+		if highest >= -1 and highest+1 < len(numerals):
+			newP.setFirstName(newP.firstName()+" "+numerals[highest+1])
 
 		self.addPerson(newP)
 		return newP
