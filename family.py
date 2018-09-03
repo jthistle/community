@@ -118,11 +118,6 @@ class Family:
 		self.eventLog.append(s)
 
 	def passTime(self, season, harshWinter):
-		# Family actions TODO
-		# - Calculate income of food (DONE)
-		# - Share out food (DONE)
-		# - Individual pass time (WIP)
-		# - Adjust merchant and farmer incomes (either too high or low)
 		self.log("== {} ==".format(self.seasonToString(season)))
 
 		adults = 0

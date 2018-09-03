@@ -217,7 +217,7 @@ class Person:
 			b.getAttr("a")*max(0, (b.getAttr("e")-self.getAttr("e"))) -
 			0.5*b.getAttr("n")*(1-self.getAttr("a"))+1))
 
-		cap = cap / (0.5*(abs(self.getAttr("a")-b.getAttr("a")) +
+		cap = cap / (0.5*(abs(self.getAttr("o")-b.getAttr("o")) +
 			abs(self.getAttr("c")-b.getAttr("c")))+0.1)
 
 		return cap
