@@ -202,8 +202,7 @@ class Community:
 					# Of course, this doesn't apply to family.
 					# This assumes that there is no age prejudice above 16 - TODO?
 					if i not in p.family.people:
-						addition = max(0,
-							(8 - abs(i.age//4-p.age//4)) * max(0, ((16*4-p.age)/16*4)))
+						addition = (8 - abs((i.age-p.age)//4)) * max(0, ((16*4-p.age)/16*4))
 						mappedByRapport[i] = max(0, mappedByRapport[i] + addition)
 
 					totalRapport += mappedByRapport[i]
