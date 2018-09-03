@@ -29,7 +29,7 @@ class Community:
 			if i % 2 == 0:
 				gender = "male"
 
-			tempAdults.append(Person([None, None], gender=gender, age=random.randint(18 * 4, 25 * 4), married=True))
+			tempAdults.append(Person([None, None], gender=gender, age=random.randint(18*4, 25*4), married=True))
 
 		# keep track of already paired adults
 		pairedInd = []
@@ -169,6 +169,30 @@ class Community:
 					p.die()
 				self.removeFamily(f)
 				self.deadFamilies.append(f)
+
+		# Decide whether to trigger 'family joins event'
+		if len(self.families) < COMMUNITY_FAMILY_MIN:
+			for i in range(COMMUNITY_FAMILY_JOIN):
+				# generate family
+				tempFam = Family(self)
+				p1 = Person([None, None], gender="male", age=random.randint(18*4, 25*4), married=True)
+				p2 = Person([None, None], gender="female", age=random.randint(18*4, 25*4), married=True)
+				p1.partner = p2
+				p2.partner = p1
+				p1.updateRapport(p2, 0.7)
+				p2.updateRapport(p1, 0.7)
+				tempFam.addPerson(p1)
+				tempFam.addPerson(p2)
+
+				for j in range(random.randint(2, 4)):
+					child = tempFam.generatePerson([p1, p2], age=random.randint(0, 12*4))
+					p1.children.append(child)
+					p2.children.append(child)
+					p1.updateRapport(child, 0.7)
+					p2.updateRapport(child, 0.7)
+
+				self.addFamily(tempFam)
+				self.log("The {} family, a family of {}s has joined the community".format(tempFam.familyName, tempFam.profession))
 
 		for f in self.families:
 			if len(f.people) == 0:

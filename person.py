@@ -110,13 +110,14 @@ class Person:
 			if self.timeWithPartner >= 2 and not self.romanticallyLikes(self.partner):
 				self.breakUp()
 
-			# Since conscientiousness reflects spontaneity, modify the base time by the highest value
-			minMarriageTime = BASE_MARRIAGE_MIN_TIME * (0.5 + max(self.getAttr("c"), self.partner.getAttr("c")))
-			if self.timeWithPartner >= minMarriageTime and self.age >= MARRIAGE_MIN_AGE and\
-				self.partner.age >= MARRIAGE_MIN_AGE:
-				# Get married! Other marraige conditions can go here in the future
-				if self.romanticallyLikes(self.partner) and self.partner.romanticallyLikes(self):
-					self.marryPartner()
+			if self.partner is not None:
+				# Since conscientiousness reflects spontaneity, modify the base time by the highest value
+				minMarriageTime = BASE_MARRIAGE_MIN_TIME * (0.5 + max(self.getAttr("c"), self.partner.getAttr("c")))
+				if self.timeWithPartner >= minMarriageTime and self.age >= MARRIAGE_MIN_AGE and\
+					self.partner.age >= MARRIAGE_MIN_AGE:
+					# Get married! Other marraige conditions can go here in the future
+					if self.romanticallyLikes(self.partner) and self.partner.romanticallyLikes(self):
+						self.marryPartner()
 		else:
 			self.timeWithPartner = 0
 

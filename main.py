@@ -207,6 +207,7 @@ class Application(Frame):
 			self.selectedFamily = ind
 			self.selectedPerson = None
 			self.updatePeopleList()
+			self.updateInspectorButtons()
 
 			if self.viewMode == "inspect":
 				self.inspectFamily()
