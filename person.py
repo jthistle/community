@@ -302,6 +302,7 @@ class Person:
 
 	def die(self):
 		# TODO: other things, I guess
+		self.log("I died.")
 		self.alive = False
 		self.deathData["date"] = self.family.community.date
 		bestFriends = []
@@ -309,6 +310,7 @@ class Person:
 			if not self.isRelative(p):
 				if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
 					bestFriends.append(p)
+					p.addModifier(17)
 		self.deathData["bestFriends"] = bestFriends
 		self.family.memberDied(self)
 
