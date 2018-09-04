@@ -40,6 +40,8 @@ class Person:
 		self.modifiers = {}			# mood modifiers
 		self.rapport = {}			# stores rapport with other people
 		self.timeWithPartner = 0
+		self.keyEvents = []
+		self.deathData = {}
 
 		# very fatalistic, but generates a lifetime for a person
 		self.lifetime = random.gauss(self.__lifeExpectancy, LIFE_EXPECTANCY_SD)
@@ -96,6 +98,9 @@ class Person:
 			self.partner.family = newFamily
 			newFamily.addPerson(self)
 			newFamily.addPerson(self.partner)
+
+			self.logKeyEvent("married {}".format(self.partner.firstName()))
+			self.partner.logKeyEvent("married {}".format(self.firstName()))
 
 			self.family.community.log("The couple have taken the new name of the {} family of {}s".format(
 				self.family.familyName, self.family.profession))
@@ -282,6 +287,13 @@ class Person:
 	def die(self):
 		# TODO: other things, I guess
 		self.alive = False
+		self.deathData["date"] = self.family.community.date
+		bestFriends = []
+		for p in self.rapport.keys():
+			if not self.isRelative(p):
+				if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
+					bestFriends.append(p)
+		self.deathData["bestFriends"] = bestFriends
 		self.family.memberDied(self)
 
 	def rapportStatus(self, b):
@@ -708,7 +720,7 @@ class Person:
 	def compareTo(self, b):
 		'''
 		Returns a comparison of the two people, using explainCap, and
-		rapportStatus TODO
+		rapportStatus
 		'''
 		toReturn = []
 		toReturn.append("{} {}.".format(self.explainCap(b), capitalizePreserve(self.rapportStatus(b))))
@@ -717,6 +729,14 @@ class Person:
 
 	def log(self, s):
 		self.eventLog.append(s)
+
+	def logKeyEvent(self, s):
+		self.keyEvents.append([self.family.community.date, s])
+
+	def dateToString(self, d):
+		year = BASE_YEAR + d//4
+		season = self.family.community.seasonToString(d%4)
+		return "{} {}".format(season, year)
 
 	def inspect(self):
 		'''
@@ -739,13 +759,33 @@ class Person:
 				toReturn.append("{} has been going out with {} for {} seasons.".format(
 					self.firstName(), self.partner.printableFullName(), self.timeWithPartner))
 		else:
-			toReturn.append("Died aged {}".format(self.ageToString()))
+			deathDate = self.deathData["date"]
+			toReturn.append("RIP: {} - {}".format(self.dateToString(deathDate-self.age), self.dateToString(deathDate)))
 			toReturn.append("Gender {}".format(self.gender))
+
+			if len(self.keyEvents) > 0:
+				toAdd = ""
+				for e in self.keyEvents:
+					toAdd = toAdd + "In {}, {} {}. ".format(self.dateToString(e[0]), self.firstName(), e[1])
+				toReturn.append(toAdd)
+
 			toReturn.append((self.attributesAsDescription()+" "+self.otherAttributesAsDescription()).replace(
 				" is ", " was "))
 			if self.married:
 				toReturn.append("{} was married to {}.".format(self.firstName(), self.partner.printableFullName()))
 			toReturn.append("{} was a parent to {} child(ren)".format(self.firstName(), len(self.children)))
+
+			bfs = self.deathData["bestFriends"]
+			if len(bfs) == 0:
+				toReturn.append("{} was not missed by anyone outside their family.".format(self.firstName()))
+			else:
+				toAdd = "{} was missed by ".format(self.firstName())
+				toAdd = toAdd + ", ".join([f.printableFullName() for f in bfs][:-1])
+				if len(bfs) == 1:
+					toAdd = toAdd + "{}.".format(bfs[0].printableFullName())
+				else:
+					toAdd = toAdd + ", and {}.".format(bfs[-1].printableFullName())
+				toReturn.append(toAdd)
 
 		return "\n".join(toReturn)
 

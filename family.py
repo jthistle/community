@@ -102,23 +102,11 @@ class Family:
 					p.partner.partner = None
 					p.partner = None
 
-	def seasonToString(self, n):
-		# Duplicate code, TODO move?
-		n = n%4
-		if n == 0:
-			return "Spring"
-		elif n == 1:
-			return "Summer"
-		elif n == 2:
-			return "Autumn"
-		elif n == 3:
-			return "Winter"
-
 	def log(self, s):
 		self.eventLog.append(s)
 
 	def passTime(self, season, harshWinter):
-		self.log("== {} ==".format(self.seasonToString(season)))
+		self.log("== {} ==".format(self.community.seasonToString(season)))
 
 		adults = 0
 		children = 0
