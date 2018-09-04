@@ -79,6 +79,11 @@ class Person:
 
 	def marryPartner(self):
 		if self.partner is not None and not self.married:
+			if self.gender == "female":
+				self.deathData["nee"] = self.surname()
+			else:
+				self.partner.deathData["nee"] = self.partner.surname()
+
 			self.log("I married {}".format(self.partner.printableFullName()))
 			self.partner.log("I married {}".format(self.printableFullName()))
 			self.family.community.log("{} married {}".format(
@@ -89,8 +94,15 @@ class Person:
 			self.partner.addModifier(5)
 
 			# Create new family
-			# The family name is not carried over to prevent confusion
-			newFamily = self.family.community.newFamily()
+			# The family name may be carried over or not
+			if TAKE_NEW_NAME:
+				newFamily = self.family.community.newFamily()
+			else:
+				if self.gender == "female":
+					newFamily = self.family.community.newFamily(familyName=self.partner.surname())
+				else:
+					newFamily = self.family.community.newFamily(familyName=self.surname())
+
 			self.family.removePerson(self)
 			self.partner.family.removePerson(self.partner)
 
@@ -102,8 +114,12 @@ class Person:
 			self.logKeyEvent("married {}".format(self.partner.firstName()))
 			self.partner.logKeyEvent("married {}".format(self.firstName()))
 
-			self.family.community.log("The couple have taken the new name of the {} family of {}s".format(
-				self.family.familyName, self.family.profession))
+			if TAKE_NEW_NAME:
+				self.family.community.log("The couple have taken the new name of the {} family of {}s".format(
+					self.family.familyName, self.family.profession))
+			else:
+				self.family.community.log("The couple have formed a new family of {}s".format(
+					self.family.profession))
 
 	def passTime(self):
 		self.age += 1
@@ -761,7 +777,10 @@ class Person:
 		else:
 			deathDate = self.deathData["date"]
 			toReturn.append("RIP: {} - {}".format(self.dateToString(deathDate-self.age), self.dateToString(deathDate)))
-			toReturn.append("Gender {}".format(self.gender))
+			if self.gender == "female" and "nee" in self.deathData.keys():
+				toReturn.append("Née {}, gender {}".format(self.deathData["nee"], self.gender))
+			else:
+				toReturn.append("Gender {}".format(self.gender))
 
 			if len(self.keyEvents) > 0:
 				toAdd = ""

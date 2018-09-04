@@ -164,12 +164,28 @@ class Family:
 		childFood = 0
 		adultFood = 0
 
-		if children > 0:
-			childFood = min(CHILD_FOOD_NOURISHED, self.food // children)
-			self.food -= childFood * children
-		if adults > 0:  # should always be true
-			adultFood = min(ADULT_FOOD_NOURISHED, self.food // adults)
-			self.food -= adultFood * adults
+		if self.profession == "farmer":
+			season = self.community.date%4
+			timeToNextHarvest = ((4 - season)+2)%4
+			if timeToNextHarvest == 0:
+				timeToNextHarvest = 4
+
+			# always try to fully feed children
+			if children > 0:
+				childFood = min(CHILD_FOOD_NOURISHED, (self.food // children))
+				self.food -= childFood * children
+
+			foodPerSeason = self.food//timeToNextHarvest
+			if adults > 0:
+				adultFood = min(ADULT_FOOD_NOURISHED, ((foodPerSeason-(CHILD_FOOD_NOURISHED*children)//timeToNextHarvest)//adults))
+				self.food -= adultFood * adults
+		else:
+			if children > 0:
+				childFood = min(CHILD_FOOD_NOURISHED, self.food // children)
+				self.food -= childFood * children
+			if adults > 0:  # should always be true
+				adultFood = min(ADULT_FOOD_NOURISHED, self.food // adults)
+				self.food -= adultFood * adults
 
 		for p in self.people:
 			if p.isChild():
