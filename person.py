@@ -260,7 +260,7 @@ class Person:
 			siblings = self.father().children
 			if b in siblings:
 				return True
-
+		return False
 	def firstName(self):
 		return self.name[0]
 
