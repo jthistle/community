@@ -261,6 +261,7 @@ class Person:
 			if b in siblings:
 				return True
 		return False
+
 	def firstName(self):
 		return self.name[0]
 
