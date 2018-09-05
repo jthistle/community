@@ -132,8 +132,8 @@ class Person:
 				self.breakUp()
 
 			if self.partner is not None:
-				# Since conscientiousness reflects spontaneity, modify the base time by the highest value
-				minMarriageTime = BASE_MARRIAGE_MIN_TIME * (0.5 + max(self.getAttr("c"), self.partner.getAttr("c")))
+				# Since conscientiousness reflects spontaneity, modify the base time an average *2 (= the sum)
+				minMarriageTime = BASE_MARRIAGE_MIN_TIME * (self.getAttr("c") + self.partner.getAttr("c"))
 				if self.timeWithPartner >= minMarriageTime and self.age >= MARRIAGE_MIN_AGE and\
 					self.partner.age >= MARRIAGE_MIN_AGE:
 					# Get married! Other marraige conditions can go here in the future
