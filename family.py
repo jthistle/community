@@ -129,7 +129,7 @@ class Family:
 		if self.profession == "farmer":
 			# Is it time to harvest?
 			if season == 2:
-				yieldModifier = min(1.2, max(0.8, random.gauss(1, 0.1)))
+				yieldModifier = min(YIELD_MOD_MAX, max(YIELD_MOD_MIN, random.gauss(1, YIELD_MOD_SD)))
 				if harshWinter:
 					yieldModifier *= HARSH_WINTER_MOD
 					self.log("The harsh winter has reduced yields")

@@ -63,8 +63,8 @@ class Community:
 			a1.partner = a2
 			a2.partner = a1
 
-			a1.updateRapport(a2, 0.7)
-			a2.updateRapport(a1, 0.7)
+			a1.updateRapport(a2, START_RELATIVE_RAPPORT)
+			a2.updateRapport(a1, START_RELATIVE_RAPPORT)
 
 			# Create a family for these adults
 			tempFamily = Family(self)
@@ -75,14 +75,14 @@ class Community:
 			# Now generate children
 			childrenCount = random.randint(2, 4)
 			for i in range(childrenCount):
-				child = tempFamily.generatePerson([a1, a2], age=random.randint(0, 12*4))
+				child = tempFamily.generatePerson([a1, a2], age=random.randint(0, START_CHILDREN_MAX_AGE))
 				a1.addChild(child)
 				a2.addChild(child)
 				# Make sure to set a base rapport
-				a1.updateRapport(child, 0.7)
-				a2.updateRapport(child, 0.7)
-				child.updateRapport(a1, 0.7)
-				child.updateRapport(a2, 0.7)
+				a1.updateRapport(child, START_RELATIVE_RAPPORT)
+				a2.updateRapport(child, START_RELATIVE_RAPPORT)
+				child.updateRapport(a1, START_RELATIVE_RAPPORT)
+				child.updateRapport(a2, START_RELATIVE_RAPPORT)
 
 			# Give enough food for the year
 			tempFamily.food = (10*2 + 6*childrenCount)*4
@@ -179,17 +179,17 @@ class Community:
 				p2 = Person([None, None], gender="female", age=random.randint(18*4, 25*4), married=True)
 				p1.partner = p2
 				p2.partner = p1
-				p1.updateRapport(p2, 0.7)
-				p2.updateRapport(p1, 0.7)
+				p1.updateRapport(p2, START_RELATIVE_RAPPORT)
+				p2.updateRapport(p1, START_RELATIVE_RAPPORT)
 				tempFam.addPerson(p1)
 				tempFam.addPerson(p2)
 
 				for j in range(random.randint(2, 4)):
-					child = tempFam.generatePerson([p1, p2], age=random.randint(0, 12*4))
+					child = tempFam.generatePerson([p1, p2], age=random.randint(0, START_CHILDREN_MAX_AGE))
 					p1.children.append(child)
 					p2.children.append(child)
-					p1.updateRapport(child, 0.7)
-					p2.updateRapport(child, 0.7)
+					p1.updateRapport(child, START_RELATIVE_RAPPORT)
+					p2.updateRapport(child, START_RELATIVE_RAPPORT)
 
 				self.addFamily(tempFam)
 				self.log("The {} family, a family of {}s has joined the community".format(tempFam.familyName, tempFam.profession))

@@ -57,7 +57,7 @@ class Person:
 		self.attributes = {}
 		# Attributes are based on a truncated gaussian distribution
 		for attr in self.__attributes:
-			self.attributes[attr] = min(1, max(0, round(random.gauss(0.5, 0.2), 2)))
+			self.attributes[attr] = min(1, max(0, round(random.gauss(0.5, GEN_ATTR_SD), 2)))
 
 		if surname != "":
 			self.name = [nameGen.first(self.gender), surname]
@@ -256,7 +256,7 @@ class Person:
 		The romantic interest threshold is a function of extroversion, agreableness,
 		and rapport.
 		'''
-		thresh = 5 - 0.5*(self.getAttr("a")+self.getAttr("e")) - 2*self.rapport[b]
+		thresh = ROM_INTEREST_THRESH_BASE - 0.5*(self.getAttr("a")+self.getAttr("e")) - 2*self.rapport[b]
 		return thresh
 
 	def likes(self, b):
