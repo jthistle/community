@@ -5,7 +5,7 @@ A community simulator written in Python.
 
 ## Install instructions
 ### Requirements
-Python 3.6+ recommended.
+Python 3 required, 3.6+ recommended.
 This program requires the `names` python package and `tkinter`.
 
 Install names through pip with:
