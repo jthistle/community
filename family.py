@@ -105,6 +105,11 @@ class Family:
 					p.partner.partner = None
 					p.partner = None
 
+	def isMayoralFamily(self):
+		if self.community.mayorFamily == self:
+			return True
+		return False
+
 	def log(self, s):
 		self.eventLog.append(s)
 
@@ -161,6 +166,10 @@ class Family:
 				intelligenceModifier = p.getAttr("i")-0.5
 				self.food += (baseIncome*incomeModifier) + (baseIncome*intelligenceModifier)
 			self.food = round(self.food)
+
+		if self.isMayoralFamily():
+			self.log("The family recieves a mayoral food bonus")
+			self.food += MAYOR_FOOD_BONUS
 
 		# Calculate food shares
 		# Prioritise child food
