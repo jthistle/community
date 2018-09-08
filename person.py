@@ -43,6 +43,7 @@ class Person:
 		self.keyEvents = []
 		self.deathData = {}
 		self.isMayor = False
+		self.timeAsMayor = 0
 
 		# very fatalistic, but generates a lifetime for a person
 		self.lifetime = random.gauss(self.__lifeExpectancy, LIFE_EXPECTANCY_SD)

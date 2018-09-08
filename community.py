@@ -143,6 +143,8 @@ class Community:
 		if autoDateIncrease:
 			self.date += 1
 			self.mayorTime += 1
+			if self.mayor is not None:
+				self.mayor.timeAsMayor += 1
 
 		for p in self.allPeople():
 			if autoDateIncrease:
@@ -185,57 +187,85 @@ class Community:
 						del candidates[-1]
 					lowestRating = candidates[-1].mayoralSuitability()
 
-			# We now have the top three candidates.
-			# Commence voting!
-			self.log("The candidates standing are: {}, {} and {}".format(candidates[0].printableFullName(),
-				candidates[1].printableFullName(), candidates[2].printableFullName()))
+			if len(candidates) < 3:
+				self.log("There are not enough eligible candidates to hold an election.")
+			else:
+				# We now have the top three candidates.
+				# Commence voting!
+				self.log("The candidates standing are: {}, {} and {}".format(candidates[0].printableFullName(),
+					candidates[1].printableFullName(), candidates[2].printableFullName()))
 
-			votes = {c: 0 for c in candidates}
-			for p in allP:
-				if p.age >= MIN_VOTING_AGE:
-					lowestDiff = 1
-					chosen = None
-					for c in candidates:
-						if p == c:
-							# Always choose yourself if possible
-							lowestDiff = -1000
-							chosen = p
-						else:
-							orientationDiff = abs(p.politicalOrientation()-c.politicalOrientation())
-							# Modify by rapport
-							if c in p.rapport.keys():
-								orientationDiff -= p.rapport[c]*RAPPORT_VOTING_MODIFIER
-							if orientationDiff < lowestDiff:
-								chosen = c
-								lowestDiff = orientationDiff
+				votes = {c: 0 for c in candidates}
+				for p in allP:
+					if p.age >= MIN_VOTING_AGE:
+						lowestDiff = 1
+						chosen = None
+						for c in candidates:
+							if p == c:
+								# Always choose yourself if possible
+								lowestDiff = -1000
+								chosen = p
+							else:
+								orientationDiff = abs(p.politicalOrientation()-c.politicalOrientation())
+								# Modify by rapport
+								if c in p.rapport.keys():
+									orientationDiff -= p.rapport[c]*RAPPORT_VOTING_MODIFIER
+								if orientationDiff < lowestDiff:
+									chosen = c
+									lowestDiff = orientationDiff
 
-					if chosen is not None:
-						votes[chosen] += 1
-						p.log("I voted for {}".format(chosen.printableFullName()))
+						if chosen is not None:
+							votes[chosen] += 1
+							p.log("I voted for {}".format(chosen.printableFullName()))
 
-			candidatesByVotes = sorted(votes.keys(), key=lambda x: votes[x], reverse=True)
-			winner = candidatesByVotes[0]
+				candidatesByVotes = sorted(votes.keys(), key=lambda x: votes[x], reverse=True)
 
-			self.log("{} wins with {} votes".format(winner.printableFullName(), votes[winner]))
-			self.log("2nd: {} with {} votes".format(candidatesByVotes[1].printableFullName(),
-				votes[candidatesByVotes[1]]))
-			self.log("3rd: {} with {} votes".format(candidatesByVotes[2].printableFullName(),
-				votes[candidatesByVotes[2]]))
+				if votes[candidatesByVotes[0]] == votes[candidatesByVotes[1]]:
+					# Deal with a hung election
+					self.log("{} and {} are tied on {} votes".format(candidatesByVotes[0].printableFullName(),
+						candidatesByVotes[1].printableFullName(), votes[candidatesByVotes[0]]))
 
-			if self.mayor is not winner:
-				winner.logKeyEvent("became mayor")
-				winner.log("I became mayor")
-				if self.mayor is not None:
-					self.mayor.log("I left mayoral office, beaten by {}".format(winner.printableFullName()))
-					self.mayor.logKeyEvent("left mayoral office")
+					if self.mayor is not None:
+						self.log("{} leaves office after {} years as mayor, due to a hung election".format(
+							self.mayor.printableFullName(), self.mayor.timeAsMayor//4))
+						self.mayor.log("I left mayoral office after a hung election".format(self.mayor.printableFullName()))
+						self.mayor.logKeyEvent("left mayoral office")
 
-			if self.mayor is not None:
-				self.mayor.isMayor = False
+						self.mayor.isMayor = False
+						self.mayor = None
+						self.mayorFamily = None
+						self.timeAsMayor = 0
+					else:
+						self.log("No mayor has been elected.")
+				else:
+					# We have a winner! It doesn't need to be a majority, just the highest vote count.
+					winner = candidatesByVotes[0]
 
-			self.mayor = winner
-			self.mayorTime = 0
-			self.mayorFamily = self.mayor.family
-			self.mayor.isMayor = True
+					if self.mayor is not winner:
+						self.log("{} wins with {} votes".format(winner.printableFullName(), votes[winner]))
+						winner.logKeyEvent("became mayor")
+						winner.log("I became mayor")
+						if self.mayor is not None:
+							self.mayor.log("I left mayoral office, beaten by {}".format(winner.printableFullName()))
+							self.mayor.logKeyEvent("left mayoral office")
+					else:
+						self.log("{} continues in office with {} votes".format(winner.printableFullName(), votes[winner]))
+
+					self.log("2nd: {} with {} votes".format(candidatesByVotes[1].printableFullName(),
+						votes[candidatesByVotes[1]]))
+					self.log("3rd: {} with {} votes".format(candidatesByVotes[2].printableFullName(),
+						votes[candidatesByVotes[2]]))
+
+					if self.mayor is not None:
+						if self.mayor is not winner:
+							self.log("{} leaves office after {} years as mayor".format(self.mayor.printableFullName(),
+								self.mayor.timeAsMayor//4))
+						self.mayor.isMayor = False
+
+					self.mayor = winner
+					self.mayorTime = 0
+					self.mayorFamily = self.mayor.family
+					self.mayor.isMayor = True
 
 		# Decide whether to trigger 'invading army' event
 		if len(self.families) > COMMUNITY_FAMILY_LIMIT and COMMUNITY_FAMILY_LIMIT != 0:
