@@ -42,6 +42,7 @@ class Person:
 		self.timeWithPartner = 0
 		self.keyEvents = []
 		self.deathData = {}
+		self.isMayor = False
 
 		# very fatalistic, but generates a lifetime for a person
 		self.lifetime = random.gauss(self.__lifeExpectancy, LIFE_EXPECTANCY_SD)
@@ -122,9 +123,6 @@ class Person:
 					self.family.profession))
 
 	def passTime(self):
-		self.age += 1
-		self.log("== {} ==".format(self.ageToString()))
-
 		if self.partner is not None and not self.married:
 			self.timeWithPartner += 1
 			# decide whether to break up
@@ -268,6 +266,13 @@ class Person:
 		if self.calculateRomanticInterest(b) >= self.romanticInterestThreshold(b):
 			return True
 		return False
+
+	def mayoralSuitability(self):
+		'''
+		A suitability rating, based on extroversion + agreeableness
+		This is weighted 2:1 e:a - i.e. the extraversion is higher valued than agreeableness
+		'''
+		return (self.getAttr("e")*2+self.getAttr("a"))/3
 
 	def isRelative(self, b):
 		if b in self.family.people:
@@ -777,6 +782,8 @@ class Person:
 			elif self.partner is not None:
 				toReturn.append("{} has been going out with {} for {} seasons.".format(
 					self.firstName(), self.partner.printableFullName(), self.timeWithPartner))
+			if self.isMayor:
+				toReturn.append("{} is the mayor of the community.".format(self.firstName()))
 		else:
 			deathDate = self.deathData["date"]
 			toReturn.append("RIP: {} - {}".format(self.dateToString(deathDate-self.age), self.dateToString(deathDate)))

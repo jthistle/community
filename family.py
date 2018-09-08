@@ -82,6 +82,9 @@ class Family:
 			toLog = "{} died at the age of {}".format(p.printableFullName(), p.ageToString())
 			self.log(toLog)
 			self.community.log(toLog)
+			if p.isMayor:
+				self.community.log("The mayor died.")
+				self.community.mayor = None
 
 			# apply mood modifiers to:
 			# parents, siblings, children

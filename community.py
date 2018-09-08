@@ -19,6 +19,9 @@ class Community:
 		self.date = 0  # SET TO 0 IF NOT
 		self.harshWinter = False
 		self.eventLog = []
+		self.mayor = None
+		self.mayorFamily = None
+		self.mayorTime = 0
 
 		# generate 3 families, each with 2 adults and randomly 0-3 children
 		# Do this by generating 6 adults (aged 20-40) and matching them based on romantic interest
@@ -139,6 +142,12 @@ class Community:
 
 		if autoDateIncrease:
 			self.date += 1
+			self.mayorTime += 1
+
+		for p in self.allPeople():
+			if autoDateIncrease:
+				p.age += 1
+			p.log("== {} ==".format(p.ageToString()))
 
 		# update modifiers before everything else, to prevent added modifiers from being
 		# immediately decreased in duration
@@ -155,6 +164,78 @@ class Community:
 					p.addModifier(12)  # add 'cold' modifier
 			else:
 				self.harshWinter = False
+
+		if self.season() == ELECTION_SEASON and (self.mayorTime >= MAYOR_TERM_LENGTH or
+			self.mayor is None):
+			self.log("An election is occuring")
+
+			# Work out who can stand for election
+			# Max 3 candidates are chosen
+			# Everyone recieves a suitability rating, based on their extroversion + agreeableness
+
+			allP = self.allPeople()
+			candidates = []
+			lowestRating = -1
+			for p in allP:
+				rating = p.mayoralSuitability()
+				if (rating > lowestRating or len(candidates) < 3) and p.age >= MIN_MAYOR_AGE:
+					candidates.append(p)
+					candidates = sorted(candidates, key=lambda x: x.mayoralSuitability(), reverse=True)
+					if len(candidates) > 3:
+						del candidates[-1]
+					lowestRating = candidates[-1].mayoralSuitability()
+
+			# We now have the top three candidates.
+			# Commence voting!
+			self.log("The candidates standing are: {}, {} and {}".format(candidates[0].printableFullName(),
+				candidates[1].printableFullName(), candidates[2].printableFullName()))
+
+			votes = {c: 0 for c in candidates}
+			for p in allP:
+				if p.age >= MIN_VOTING_AGE:
+					lowestDiff = 1
+					chosen = None
+					for c in candidates:
+						if p == c:
+							# Always choose yourself if possible
+							lowestDiff = -1000
+							chosen = p
+						else:
+							orientationDiff = abs(p.politicalOrientation()-c.politicalOrientation())
+							# Modify by rapport
+							if c in p.rapport.keys():
+								orientationDiff -= p.rapport[c]*RAPPORT_VOTING_MODIFIER
+							if orientationDiff < lowestDiff:
+								chosen = c
+								lowestDiff = orientationDiff
+
+					if chosen is not None:
+						votes[chosen] += 1
+						p.log("I voted for {}".format(chosen.printableFullName()))
+
+			candidatesByVotes = sorted(votes.keys(), key=lambda x: votes[x], reverse=True)
+			winner = candidatesByVotes[0]
+
+			self.log("{} wins with {} votes".format(winner.printableFullName(), votes[winner]))
+			self.log("2nd: {} with {} votes".format(candidatesByVotes[1].printableFullName(),
+				votes[candidatesByVotes[1]]))
+			self.log("3rd: {} with {} votes".format(candidatesByVotes[2].printableFullName(),
+				votes[candidatesByVotes[2]]))
+
+			if self.mayor is not winner:
+				winner.logKeyEvent("became mayor")
+				winner.log("I became mayor")
+				if self.mayor is not None:
+					self.mayor.log("I left mayoral office, beaten by {}".format(winner.printableFullName()))
+					self.mayor.logKeyEvent("left mayoral office")
+
+			if self.mayor is not None:
+				self.mayor.isMayor = False
+
+			self.mayor = winner
+			self.mayorTime = 0
+			self.mayorFamily = self.mayor.family
+			self.mayor.isMayor = True
 
 		# Decide whether to trigger 'invading army' event
 		if len(self.families) > COMMUNITY_FAMILY_LIMIT and COMMUNITY_FAMILY_LIMIT != 0:
@@ -205,6 +286,9 @@ class Community:
 
 		for p in self.allPeople(minAge=START_INTERACTION_MIN_AGE):
 			# A person interacts with 0-10 people per day, based on extroversion
+			interactions = math.ceil(p.getAttr("e")*10)
+			if p.isMayor:
+				interactions = math.ceil(interactions * MAYOR_INTERACTIONS_MOD)
 			for i in range(math.ceil(p.getAttr("e")*10)):
 				# This next bit works by mapping by rapport. Basically,
 				# a person will be more likely to initiate social interactions
