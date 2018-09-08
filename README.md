@@ -3,6 +3,8 @@ A community simulator written in Python.
 
 [The wiki](https://github.com/jthistle/community/wiki) isn't complete, but contains some information about this project.
 
+Warning: I have not, and likely will not, implement backwards compatability for save files. Every update can and probably will break any save files.
+
 ## Install instructions
 ### Requirements
 Python 3 required, 3.6+ recommended.
