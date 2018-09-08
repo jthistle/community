@@ -241,13 +241,15 @@ class Community:
 					# We have a winner! It doesn't need to be a majority, just the highest vote count.
 					winner = candidatesByVotes[0]
 
+					# Add lost election modifiers
+					candidatesByVotes[1].addModifier(19)
+					candidatesByVotes[2].addModifier(19)
+
 					if self.mayor is not winner:
 						self.log("{} wins with {} votes".format(winner.printableFullName(), votes[winner]))
 						winner.logKeyEvent("became mayor")
 						winner.log("I became mayor")
-						if self.mayor is not None:
-							self.mayor.log("I left mayoral office, beaten by {}".format(winner.printableFullName()))
-							self.mayor.logKeyEvent("left mayoral office")
+						winner.addModifier(18)
 					else:
 						self.log("{} continues in office with {} votes".format(winner.printableFullName(), votes[winner]))
 
@@ -260,6 +262,8 @@ class Community:
 						if self.mayor is not winner:
 							self.log("{} leaves office after {} years as mayor".format(self.mayor.printableFullName(),
 								self.mayor.timeAsMayor//4))
+							self.mayor.log("I left mayoral office, beaten by {}".format(winner.printableFullName()))
+							self.mayor.logKeyEvent("left mayoral office")
 						self.mayor.isMayor = False
 
 					self.mayor = winner
@@ -336,7 +340,7 @@ class Community:
 
 					# Younger people will want to talk to people of their own age.
 					# So, decrease the mapping by a number based on age.
-					# How doesn the formula work? Black magic and duct tape.
+					# How does the formula work? Black magic and duct tape.
 					# Of course, this doesn't apply to family.
 					# This assumes that there is no age prejudice above 16 - TODO?
 					if i not in p.family.people:

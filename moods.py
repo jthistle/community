@@ -18,5 +18,7 @@ MOODS = {
 	14:	["Made a profit",		0.2,	1],
 	15:	["Child born",			0.4,	2],
 	16:	["Rebuffed",			-0.1,	1],
-	17:	["Best friend died",	-0.5,	2]
+	17:	["Best friend died",	-0.5,	2],
+	18:	["Became mayor",		0.3,	2],
+	19:	["Lost election",		-0.2,	2]
 }
