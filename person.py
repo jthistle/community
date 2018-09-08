@@ -177,7 +177,8 @@ class Person:
 		if self.partner is None:
 			friends = self.countFriends()
 			if friends[0] <= MAX_ARMY_BEST_FRIENDS and friends[1] <= MAX_ARMY_FRIENDS and\
-				self.age >= MIN_ARMY_AGE and self.age <= MAX_ARMY_AGE and self.gender == "male":
+				self.age >= MIN_ARMY_AGE and self.age <= MAX_ARMY_AGE and self.gender == "male"\
+				and not self.isMayor:
 				# Whether someone wants to join the army is a function of conscientiousness
 				multiplier = 10
 				armyChance = multiplier*(BASE_ARMY_CHANCE - self.getAttr("c")*2)
