@@ -22,6 +22,9 @@ class Community:
 		self.mayor = None
 		self.mayorFamily = None
 		self.mayorTime = 0
+		self.mayorTerms = 0
+		# In the format ["mayor name", start date, end date]
+		self.mayorHistory = []
 
 		# generate 3 families, each with 2 adults and randomly 0-3 children
 		# Do this by generating 6 adults (aged 20-40) and matching them based on romantic interest
@@ -130,6 +133,17 @@ class Community:
 
 		return tempP
 
+	def startMayorTime(self, p):
+		self.mayorHistory.append([p.printableFullName(), self.date, -1])
+
+	def endMayorTime(self):
+		self.mayorHistory[-1][2] = self.date
+
+	def mayorTotalTime(self):
+		years = (self.mayorTerms * MAYOR_TERM_LENGTH)//4
+		years += self.mayorTime//4
+		return years
+
 	def passTime(self, autoDateIncrease=True):
 		'''
 		Passes time, updating things in this order:
@@ -143,8 +157,6 @@ class Community:
 		if autoDateIncrease:
 			self.date += 1
 			self.mayorTime += 1
-			if self.mayor is not None:
-				self.mayor.timeAsMayor += 1
 
 		for p in self.allPeople():
 			if autoDateIncrease:
@@ -227,14 +239,17 @@ class Community:
 
 					if self.mayor is not None:
 						self.log("{} leaves office after {} years as mayor, due to a hung election".format(
-							self.mayor.printableFullName(), self.mayor.timeAsMayor//4))
+							self.mayor.printableFullName(), self.mayorTotalTime()))
 						self.mayor.log("I left mayoral office after a hung election".format(self.mayor.printableFullName()))
 						self.mayor.logKeyEvent("left mayoral office")
 
 						self.mayor.isMayor = False
 						self.mayor = None
 						self.mayorFamily = None
-						self.timeAsMayor = 0
+						self.mayorTime = 0
+						self.mayorTerms = 0
+						# Set end date for this person
+						self.endMayorTime()
 					else:
 						self.log("No mayor has been elected.")
 				else:
@@ -252,6 +267,7 @@ class Community:
 						winner.addModifier(18)
 					else:
 						self.log("{} continues in office with {} votes".format(winner.printableFullName(), votes[winner]))
+						self.mayorTerms += 1
 
 					self.log("2nd: {} with {} votes".format(candidatesByVotes[1].printableFullName(),
 						votes[candidatesByVotes[1]]))
@@ -261,11 +277,19 @@ class Community:
 					if self.mayor is not None:
 						if self.mayor is not winner:
 							self.log("{} leaves office after {} years as mayor".format(self.mayor.printableFullName(),
-								self.mayor.timeAsMayor//4))
+								self.mayorTotalTime()))
 							self.mayor.log("I left mayoral office, beaten by {}".format(winner.printableFullName()))
 							self.mayor.logKeyEvent("left mayoral office")
+							# Set end date for this person
+							self.endMayorTime()
 						self.mayor.isMayor = False
 
+					if self.mayor is not winner:
+						# Set start date for this person
+						self.startMayorTime(winner)
+						self.mayorTerms = 0
+
+					# Actally set the mayor variables
 					self.mayor = winner
 					self.mayorTime = 0
 					self.mayorFamily = self.mayor.family

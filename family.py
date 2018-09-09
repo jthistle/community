@@ -83,11 +83,10 @@ class Family:
 			self.log(toLog)
 			self.community.log(toLog)
 			if p.isMayor:
-				if p.timeAsMayor >= 4:
-					timeInOffice = "{} years".format(p.timeAsMayor//4)
-				else:
-					timeInOffice = "{} seasons".format(p.timeAsMayor)
-				self.community.log("The mayor died after {} in office.".format(timeInOffice))
+				time = self.community.mayorTotalTime()
+				self.community.log("The mayor died after {} years in office.".format(time))
+				# Set end date
+				self.community.endMayorTime()
 				self.community.mayor = None
 
 			# apply mood modifiers to:

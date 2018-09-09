@@ -11,6 +11,7 @@ from person import Person
 from family import Family
 from community import Community
 from tests import Tests
+from config import *
 
 
 class Application(Frame):
@@ -42,12 +43,14 @@ class Application(Frame):
 		self.loadBtn.grid(row=0, column=2, sticky=E+W)
 		self.exitBtn = Button(self.btnFrame, text="Exit", command=root.destroy)
 		self.exitBtn.grid(row=0, column=3, sticky=E+W)
+		self.mayorListBtn = Button(self.btnFrame, text="Mayor list", command=self.mayorListWindow)
+		self.mayorListBtn.grid(row=0, column=4, sticky=E+W)
 		self.dateLabel = Label(self.btnFrame, text="")
-		self.dateLabel.grid(row=0, column=4, sticky=E+W, padx=10)
+		self.dateLabel.grid(row=0, column=5, sticky=E+W, padx=10)
 		self.inspectBtn = Button(self.btnFrame, text="Inspect", command=self.onInspectBtnClick)
-		self.inspectBtn.grid(row=0, column=5, sticky=E+W)
+		self.inspectBtn.grid(row=0, column=6, sticky=E+W)
 		self.compareBtn = Button(self.btnFrame, text="Compare", command=self.onCompareBtnClick)
-		self.compareBtn.grid(row=0, column=6, sticky=E+W)
+		self.compareBtn.grid(row=0, column=7, sticky=E+W)
 		self.restFrame = Frame()
 		self.restFrame.pack(fill=X)
 		self.restFrame.grid_columnconfigure(0, minsize=5, weight=0)
@@ -334,6 +337,15 @@ class Application(Frame):
 		w.main = FamilyTree(w, self.getSelectedPerson())
 		w.main.pack(fill=BOTH)
 
+	def mayorListWindow(self):
+		w = Toplevel(self)
+		w.geometry("600x600")
+		w.resizable(0, 0)
+		w.wm_attributes("-topmost", 1)
+		w.grab_set()
+		w.main = MayorList(w, community=self.community)
+		w.main.pack(fill=BOTH)
+
 	def blank(self):
 		'Placeholder function'
 		None
@@ -456,6 +468,49 @@ class FamilyTree(Frame):
 			ind = int(self.childrenLb.curselection()[0])
 			self.person = self.person.children[ind]
 			self.updateWidgets()
+
+	def closeWindow(self):
+		self.master.grab_release()
+		self.master.destroy()
+
+
+class MayorList(Frame):
+	def __init__(self, master=None, community=None):
+		super().__init__(master)
+		self.master = master
+		self.community = community
+		self.pack()
+		self.createWidgets()
+		self.updateWidgets()
+
+	def createWidgets(self):
+		self.exitBtn = Button(self, text="Close Mayor list", command=self.closeWindow)
+		self.exitBtn.pack(side=TOP)
+
+		self.mayorListbox = Listbox(self, exportselection=False, height=20, width=40)
+		self.mayorListbox.pack(side=TOP)
+
+	def updateWidgets(self):
+		self.mayorListbox.delete(0, END)
+		for i in range(len(self.community.mayorHistory)-1, -1, -1):
+			h = self.community.mayorHistory[i]
+			name = h[0]
+			startDate = h[1]
+			endDate = h[2]
+
+			if endDate == -1:
+				endDateStr = "present"
+			else:
+				endDateStr = self.dateToString(endDate)
+			startDateStr = self.dateToString(startDate)
+
+			self.mayorListbox.insert(END, "{}: {} - {}".format(name, startDateStr, endDateStr))
+
+	# NOTE: code duplication from Person
+	def dateToString(self, d):
+		year = BASE_YEAR + d//4
+		season = self.community.seasonToString(d%4)
+		return "{} {}".format(season, year)
 
 	def closeWindow(self):
 		self.master.grab_release()
