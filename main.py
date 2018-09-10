@@ -356,6 +356,7 @@ class FamilyTree(Frame):
 		super().__init__(master)
 		self.master = master
 		self.person = person
+		self.focus = None
 		self.pack()
 		self.createWidgets()
 		self.updateWidgets()
@@ -389,6 +390,13 @@ class FamilyTree(Frame):
 		self.childrenLb = Listbox(self.treeFrame)
 		self.childrenLb.grid(row=1, column=2)
 		self.childrenLb.bind('<<ListboxSelect>>', self.onChildrenLbChange)
+
+		self.focusFrame = Frame(self, pady=5, padx=5)
+		self.focusFrame.pack(fill=X)
+		self.focusBtn = Button(self.focusFrame, text="Focus on selected", command=self.setFocus, padx=5)
+		self.focusBtn.grid(row=0, column=0)
+		self.focusLabel = Label(self.focusFrame, text="No focus", padx=5)
+		self.focusLabel.grid(row=0, column=1)
 
 	def updateWidgets(self):
 		'''
@@ -442,6 +450,141 @@ class FamilyTree(Frame):
 				toAppend = toAppend+" (l.)"
 			self.childrenLb.insert(END, p.printableFullName()+toAppend)
 
+		if self.focus is not None:
+			self.focusLabel.config(text=self.focus.printableFullName())
+			# Work out relationships
+			# These are done from the POV of the focus
+			# e.g [name] is [focus]'s father
+			if self.focus is not self.person:
+				relationships = []
+				# print("debug: Searching for {}".format(self.person.printableFullName()))
+				findRel = self.findRelative(self.focus, self.person, 3, toReturn=[])
+				if findRel:
+					for yVal in findRel.keys():
+						yCoord = yVal
+						xCoord = findRel[yVal]
+
+						if xCoord == 0:
+							if yCoord == -3:
+								relationships.append("great grandchild")
+							elif yCoord == -2:
+								relationships.append("grandchild")
+							elif yCoord == -1:
+								relationships.append("child")
+							elif yCoord == 0:
+								relationships.append("sibling")
+							elif yCoord == 1:
+								relationships.append("parent")
+							elif yCoord == 2:
+								relationships.append("grandparent")
+							elif yCoord == 2:
+								relationships.append("great grandparent")
+						elif xCoord == 1:
+							if yCoord == -3:
+								relationships.append("great grand niece/nephew")
+							elif yCoord == -2:
+								relationships.append("grand niece/nephew")
+							elif yCoord == -1:
+								relationships.append("niece/nephew")
+							elif yCoord == 0:
+								relationships.append("first cousin")
+							elif yCoord == 1:
+								relationships.append("aunt/uncle")
+							elif yCoord == 2:
+								relationships.append("great aunt/uncle")
+							elif yCoord == 3:
+								relationships.append("great grand aunt/uncle")
+						elif xCoord == 2:
+							if yCoord == -3:
+								relationships.append("second cousin thrice removed")
+							elif yCoord == -2:
+								relationships.append("second cousin twice removed")
+							elif yCoord == -1:
+								relationships.append("second cousin once removed")
+							elif yCoord == 0:
+								relationships.append("second cousin")
+							elif yCoord == 1:
+								relationships.append("second cousin once removed")
+							elif yCoord == 2:
+								relationships.append("second cousin twice removed")
+							elif yCoord == 3:
+								relationships.append("second cousin thrice removed")
+						if len(relationships) == 0:
+							self.focusLabel.config(text="No genetic relationship between {} and {}".format(
+								self.person.printableFullName(), self.focus.printableFullName()))
+						else:
+							self.focusLabel.config(text="{} is the {} of {}".format(
+								self.person.printableFullName(), ", ".join(relationships), self.focus.printableFullName()))
+
+					# For debug:
+					# self.focusLabel.config(text=str(findRel))
+
+	# The plan: use x and y coordinates. Y = how many generations up
+	# X = how much separation - 0,0 = sibling, 1,0 = first cousin, 2,0 = second cousin
+	def findRelative(self, focus, person, yLimit, currentX=0, currentY=0, goneDown=False,
+		goneAcross=False, goneUp=False, firstCall=True, toReturn=[], depth=0):
+		DEBUG = False
+		if currentY > yLimit or currentY < -yLimit:
+			return False
+		if focus == person:
+			if DEBUG:
+				print("="*depth+"debug: **FOUND** {} at {}".format(focus.printableFullName(), str((currentX, currentY))))
+			if currentY == 0 and goneAcross and not goneDown:
+				toReturn.append((currentX-1, currentY))
+			else:
+				toReturn.append((currentX, currentY))
+
+		# First: loop through siblings if haven't come from sibling loop
+		# Then: go down to children
+		# Then: go up to parents if haven't ever gone down
+		if focus.parents[0] is not None and not goneAcross:
+			siblings = focus.parents[0].children
+			for s in siblings:
+				if s == focus:
+					# s is not a sibling of themself
+					continue
+				if DEBUG:
+					print("="*depth+"debug: going across to {}".format(s.printableFullName()))
+				findRel = self.findRelative(s, person, yLimit, currentX+1, currentY, goneDown=goneDown,
+					goneAcross=True, goneUp=False, firstCall=False, toReturn=toReturn, depth=depth+1)
+				if findRel:
+					toReturn = findRel
+
+		# don't go straight back down if we've just come up
+		if not goneUp:
+			for c in focus.children:
+				if DEBUG:
+					print("="*depth+"debug: going down to {}".format(c.printableFullName()))
+				findRel = self.findRelative(c, person, yLimit, currentX, currentY-1, goneDown=True, goneAcross=False,
+					goneUp=False, firstCall=False, toReturn=toReturn, depth=depth+1)
+				if findRel:
+					toReturn = findRel
+
+		# Don't go up if we've ever gone down, or we've just come from siblings
+		if focus.parents[0] is not None and not goneDown and not goneAcross:
+			for p in focus.parents:
+				if DEBUG:
+					print("="*depth+"debug: going up to {}".format(p.printableFullName()))
+				findRel = self.findRelative(p, person, yLimit, currentX, currentY+1, goneDown=goneDown, goneAcross=False,
+					goneUp=True, firstCall=False, toReturn=toReturn, depth=depth+1)
+				if findRel:
+					toReturn = findRel
+
+		if firstCall:
+			# return only the smallest x val for each y val
+			yVals = {}
+			for c in toReturn:
+				if DEBUG:
+					print("debug: Looking at {}".format(str(c)))
+				if c[1] in yVals.keys():
+					if yVals[c[1]] > c[0]:
+						yVals[c[1]] = c[0]
+				else:
+					yVals[c[1]] = c[0]
+			return yVals
+		else:
+			return toReturn
+
 	def onParentsLbChange(self, evt):
 		if len(self.parentsLb.curselection()) > 0:
 			ind = int(self.parentsLb.curselection()[0])
@@ -468,6 +611,10 @@ class FamilyTree(Frame):
 			ind = int(self.childrenLb.curselection()[0])
 			self.person = self.person.children[ind]
 			self.updateWidgets()
+
+	def setFocus(self):
+		self.focus = self.person
+		self.updateWidgets()
 
 	def closeWindow(self):
 		self.master.grab_release()
