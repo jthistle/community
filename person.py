@@ -55,6 +55,8 @@ class Person:
 		else:
 			self.gender = random.choice(self.__genders)
 
+		self.artistic = random.choice(ARTISTIC)
+
 		self.attributes = {}
 		# Attributes are based on a truncated gaussian distribution
 		for attr in self.__attributes:
@@ -186,6 +188,36 @@ class Person:
 					self.family.community.log("{} has left the community to join the army at the age of {}".format(
 						self.printableFullName(), self.ageToString()))
 					self.family.removePerson(self)
+
+		# Randomly generate a great work
+		if self.getAttr("i") > GW_INT_THRESH and self.age >= GW_MIN_AGE:
+			prob = int(round((1.5-self.getAttr("i")) * (1.5-self.getAttr("c")), 2)*100)
+			if random.randint(1, prob) == 1:
+				op = self.getAttr("o")
+				ar = self.artistic
+				workDesc = ""
+				if op >= 0.5:
+					if ar == "musician":
+						workDesc = "composed "+random.choice([
+							"an opera", "a symphony", "a suite", "a concerto"])
+					elif ar == "artist":
+						workDesc = random.choice([
+							"painted a painting", "made a sculpture", "painted a fresco",
+							"organised an exhibition"])
+					elif ar == "author":
+						workDesc = "wrote "+random.choice([
+							"a novel", "an epic", "a play", "a poem"])
+				else:
+					workDesc = "wrote "+random.choice([
+						"a political treatise", "a scientific paper", "a speech"])
+
+				nameGen = NameGen()
+				workTitle = nameGen.workTitle()
+				fullTitle = workDesc + ", '" + workTitle + "'"
+				self.log("I {}".format(fullTitle))
+				self.family.community.log("{} {}".format(self.printableFullName(), fullTitle))
+				self.logKeyEvent("{}".format(fullTitle))
+				self.addModifier(20)
 
 		# mood level at which someone will commit suicide is currently
 		# TODO Could be a function of something in future?

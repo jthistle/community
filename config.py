@@ -13,6 +13,7 @@ LIFE_EXPECTANCY = 40*4
 # standard deviation for life expectancy random gaussian distribution
 LIFE_EXPECTANCY_SD = 5*4
 GEN_ATTR_SD = 0.2
+ARTISTIC = ["author", "musician", "artist"]
 
 START_CHILDREN_MAX_AGE = 12*4
 START_RELATIVE_RAPPORT = 0.7
@@ -97,3 +98,6 @@ MIN_VOTING_AGE = 16*4
 RAPPORT_VOTING_MODIFIER = (1/4)
 MAYOR_INTERACTIONS_MOD = 1.5
 MAYOR_FOOD_BONUS = 10
+
+GW_INT_THRESH = 0.8
+GW_MIN_AGE = 16*4
