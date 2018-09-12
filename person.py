@@ -353,6 +353,12 @@ class Person:
 		self.deathData["bestFriends"] = bestFriends
 		self.family.memberDied(self)
 
+	def getRapport(self, b):
+		if b in self.rapport.keys():
+			return self.rapport[b]
+		else:
+			return 0
+
 	def rapportStatus(self, b):
 		'''
 		Returns rapport as a third-person opinion sentence

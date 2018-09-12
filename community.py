@@ -444,16 +444,51 @@ class Community:
 								famMod = FAMILY_ARGUMENT_MOD
 							else:
 								famMod = 1
-							if b.age > MIN_ARGUMENT_AGE and p.age > MIN_ARGUMENT_AGE:
-								p.updateRapport(b, ARGUMENT_RAPPORT_GAIN*INTERACTED_WITH_MOD*famMod)
-								b.updateRapport(p, ARGUMENT_RAPPORT_GAIN*famMod)
-								p.log("I had an argument with {}".format(b.printableFullName()))
-								b.log("{} had an argument with me".format(p.printableFullName()))
-							else:
-								p.updateRapport(b, ANGRY_LOOK_RAPPORT_GAIN*INTERACTED_WITH_MOD*famMod)
-								b.updateRapport(p, ANGRY_LOOK_RAPPORT_GAIN*famMod)
-								p.log("I gave {} an angry look".format(b.printableFullName()))
-								b.log("{} gave me an angry look".format(p.printableFullName()))
+
+							# Decide whether to initiate a fight
+							fought = False
+							if p.getRapport(b) <= FIGHT_MAX_RAPPORT and p.age > FIGHT_MIN_AGE:
+								chance = max(2, FIGHT_BASE_CHANCE - (p.getAttr("e")*2+p.getAttr("n")*2))
+
+								if random.uniform(0, chance) <= 1:
+									print("debug: fight! {} vs {}".format(p.printableFullName(), b.printableFullName()))
+									p.updateRapport(b, FIGHT_RAPPORT_GAIN*INTERACTED_WITH_MOD*famMod)
+									b.updateRapport(p, FIGHT_RAPPORT_GAIN*famMod)
+									p.log("I started a fight with {}".format(b.printableFullName()))
+									b.log("{} started a fight with me".format(p.printableFullName()))
+									if random.randint(1, FIGHT_DEATH_CHANCE) == 1:
+										if random.randint(1, 2) == 1:
+											self.log("{} killed {} after {} started a fight".format(
+												p.printableFullName(), b.printableFullName(), p.firstName()))
+											b.die()
+											if p.sociopathy() >= SOCIOPATH_THRESH:
+												p.log("I killed {}, but feel no remorse.".format(b.firstName()))
+											else:
+												p.log("I killed {}. I feel terrible.".format(b.firstName()))
+												p.addModifier(21)
+										else:
+											self.log("{} killed {} in self-defence after {} started a fight".format(
+												b.printableFullName(), p.printableFullName(), p.firstName()))
+											p.die()
+											if b.sociopathy() >= SOCIOPATH_THRESH:
+												b.log("I killed {} in self-defence, but feel no remorse.".format(p.firstName()))
+											else:
+												b.log("I killed {} in self-defence.".format(p.firstName()))
+												b.addModifier(22)
+									fought = True
+
+							if not fought:
+								if b.age > MIN_ARGUMENT_AGE and p.age > MIN_ARGUMENT_AGE:
+									p.updateRapport(b, ARGUMENT_RAPPORT_GAIN*INTERACTED_WITH_MOD*famMod)
+									b.updateRapport(p, ARGUMENT_RAPPORT_GAIN*famMod)
+									p.log("I had an argument with {}".format(b.printableFullName()))
+									b.log("{} had an argument with me".format(p.printableFullName()))
+								else:
+									p.updateRapport(b, ANGRY_LOOK_RAPPORT_GAIN*INTERACTED_WITH_MOD*famMod)
+									b.updateRapport(p, ANGRY_LOOK_RAPPORT_GAIN*famMod)
+									p.log("I gave {} an angry look".format(b.printableFullName()))
+									b.log("{} gave me an angry look".format(p.printableFullName()))
+
 						break
 					else:
 						currentNum += mappedByRapport[b]

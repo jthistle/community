@@ -51,6 +51,8 @@ RAPPORT_DECAY = 0.05
 
 SUICIDE_MIN_MOOD_LEVEL = -1.5
 
+SOCIOPATH_THRESH = 0.9
+
 START_INTERACTION_MIN_AGE = 3*4
 DT_CHANCE = 3
 DT_RAPPORT_GAIN = 0.09
@@ -63,6 +65,13 @@ CAP_MODIFIER = 4  # divided by
 MIN_ASKOUT_AGE = 16*4
 
 MIN_ARGUMENT_AGE = 5*4
+
+FIGHT_MAX_RAPPORT = -0.75  # TODO - change?
+FIGHT_BASE_CHANCE = 15
+FIGHT_MIN_AGE = 12*4
+FIGHT_DEATH_CHANCE = 35
+
+FIGHT_RAPPORT_GAIN = -0.1
 
 # Modifier applied to rapport if someone else initiated
 # the interaction.
