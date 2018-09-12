@@ -220,8 +220,7 @@ class Community:
 							else:
 								orientationDiff = abs(p.politicalOrientation()-c.politicalOrientation())
 								# Modify by rapport
-								if c in p.rapport.keys():
-									orientationDiff -= p.rapport[c]*RAPPORT_VOTING_MODIFIER
+								orientationDiff -= p.getRapport(c)*RAPPORT_VOTING_MODIFIER
 								if orientationDiff < lowestDiff:
 									chosen = c
 									lowestDiff = orientationDiff
@@ -357,10 +356,7 @@ class Community:
 					if i == p:
 						continue
 
-					if i in p.rapport.keys():
-						mappedByRapport[i] = p.rapport[i]+1  # +1 to make positive
-					else:
-						mappedByRapport[i] = 1  # neutral
+					mappedByRapport[i] = p.getRapport(i)+1  # +1 to make positive
 
 					# Younger people will want to talk to people of their own age.
 					# So, decrease the mapping by a number based on age.

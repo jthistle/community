@@ -235,10 +235,10 @@ class Person:
 
 		# Rapport decays towards 0 by a set value per season
 		for r in self.rapport.keys():
-			if self.rapport[r] >= RAPPORT_DECAY:
-				self.rapport[r] -= RAPPORT_DECAY
-			elif self.rapport[r] <= -RAPPORT_DECAY:
-				self.rapport[r] += RAPPORT_DECAY
+			if self.getRapport(r) >= RAPPORT_DECAY:
+				self.updateRapport(-RAPPORT_DECAY)
+			elif self.getRapport(r) <= -RAPPORT_DECAY:
+				self.updateRapport(RAPPORT_DECAY)
 			else:
 				self.rapport[r] = 0
 
@@ -287,7 +287,7 @@ class Person:
 		The romantic interest threshold is a function of extroversion, agreableness,
 		and rapport.
 		'''
-		thresh = ROM_INTEREST_THRESH_BASE - 0.5*(self.getAttr("a")+self.getAttr("e")) - 2*self.rapport[b]
+		thresh = ROM_INTEREST_THRESH_BASE - 0.5*(self.getAttr("a")+self.getAttr("e")) - 2*self.getRapport(b)
 		return thresh
 
 	def likes(self, b):
@@ -347,15 +347,15 @@ class Person:
 		bestFriends = []
 		for p in self.rapport.keys():
 			if not self.isRelative(p):
-				if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
+				if self.getRapport(p) >= BEST_FRIEND_THRESHOLD:
 					bestFriends.append(p)
 					p.addModifier(17)
 		self.deathData["bestFriends"] = bestFriends
 		self.family.memberDied(self)
 
-	def getRapport(self, b):
-		if b in self.rapport.keys():
-			return self.rapport[b]
+	def getRapport(self, p):
+		if p in self.rapport.keys():
+			return self.rapport[p]
 		else:
 			return 0
 
@@ -366,7 +366,7 @@ class Person:
 		n1 = self.firstName()
 		n2 = b.firstName()
 		if b in self.rapport.keys():
-			rp = self.rapport[b]
+			rp = self.getRapport(b)
 			if rp >= 1:
 				return "{} knows {} better than anyone".format(n1, n2)
 			elif rp >= 0.8:
@@ -393,13 +393,13 @@ class Person:
 		friends = []
 
 		# sort by rapport
-		sortedRapportKeys = sorted(list(self.rapport.keys()), key=lambda x: self.rapport[x], reverse=True)
+		sortedRapportKeys = sorted(list(self.rapport.keys()), key=lambda x: self.getRapport(x), reverse=True)
 		for p in sortedRapportKeys:
 			if self.isRelative(p) or not p.alive:
 				continue
-			if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
+			if self.getRapport(p) >= BEST_FRIEND_THRESHOLD:
 				bestFriends.append(p)
-			elif self.rapport[p] >= FRIEND_THRESHOLD:
+			elif self.getRapport(p) >= FRIEND_THRESHOLD:
 				friends.append(p)
 
 		toReturn = []
@@ -419,7 +419,7 @@ class Person:
 
 	def countFriends(self):
 		'''
-		Returns [friends, best friends]
+		Returns [best friends, friends]
 		'''
 		bestFriends = 0
 		friends = 0
@@ -427,9 +427,9 @@ class Person:
 		for p in self.rapport.keys():
 			if self.isRelative(p) or not p.alive:
 				continue
-			if self.rapport[p] >= BEST_FRIEND_THRESHOLD:
+			if self.getRapport(p) >= BEST_FRIEND_THRESHOLD:
 				bestFriends += 1
-			elif self.rapport[p] >= FRIEND_THRESHOLD:
+			elif self.getRapport(p) >= FRIEND_THRESHOLD:
 				friends += 1
 
 		return [bestFriends, friends]
