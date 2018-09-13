@@ -25,6 +25,8 @@ class Community:
 		self.mayorTerms = 0
 		# In the format ["mayor name", start date, end date]
 		self.mayorHistory = []
+		# In the format ["title", "author name", date]
+		self.greatWorks = []
 
 		# generate 3 families, each with 2 adults and randomly 0-3 children
 		# Do this by generating 6 adults (aged 20-40) and matching them based on romantic interest
@@ -447,7 +449,6 @@ class Community:
 								chance = max(2, FIGHT_BASE_CHANCE - (p.getAttr("e")*2+p.getAttr("n")*2))
 
 								if random.uniform(0, chance) <= 1:
-									print("debug: fight! {} vs {}".format(p.printableFullName(), b.printableFullName()))
 									p.updateRapport(b, FIGHT_RAPPORT_GAIN*INTERACTED_WITH_MOD*famMod)
 									b.updateRapport(p, FIGHT_RAPPORT_GAIN*famMod)
 									p.log("I started a fight with {}".format(b.printableFullName()))

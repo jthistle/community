@@ -198,18 +198,25 @@ class Person:
 				workDesc = ""
 				if op >= 0.5:
 					if ar == "musician":
-						workDesc = "composed "+random.choice([
-							"an opera", "a symphony", "a suite", "a concerto"])
+						workTypes = [("opera", "an opera"), ("symphony", "a symphony"),
+							("suite", "a suite"), ("concerto", "a concerto")]
+						choice = random.choice(workTypes)
+						workDesc = "composed "+choice[1]
 					elif ar == "artist":
-						workDesc = random.choice([
-							"painted a painting", "made a sculpture", "painted a fresco",
-							"organised an exhibition"])
+						workTypes = [("painting", "painted a painting"), ("sculpture", "made a sculpture"),
+							("fresco", "painted a fresco"), ("exhibition", "organised an exhibition")]
+						choice = random.choice(workTypes)
+						workDesc = choice[1]
 					elif ar == "author":
-						workDesc = "wrote "+random.choice([
-							"a novel", "an epic", "a play", "a poem"])
+						workTypes = [("novel", "a novel"), ("epic", "an epic"),
+							("play", "a play"), ("poem", "a poem")]
+						choice = random.choice(workTypes)
+						workDesc = "wrote "+choice[1]
 				else:
-					workDesc = "wrote "+random.choice([
-						"a political treatise", "a scientific paper", "a speech"])
+					workTypes = [("treatise", "a political treatise"), ("paper", "a scientific paper"),
+						("speech", "a speech")]
+					choice = random.choice(workTypes)
+					workDesc = "wrote "+choice[1]
 
 				nameGen = NameGen()
 				workTitle = nameGen.workTitle()
@@ -217,6 +224,9 @@ class Person:
 				self.log("I {}".format(fullTitle))
 				self.family.community.log("{} {}".format(self.printableFullName(), fullTitle))
 				self.logKeyEvent("{}".format(fullTitle))
+				self.family.community.greatWorks.append(
+					["{}: '{}'".format(choice[0], workTitle), self.printableFullName(), self.family.community.date])
+
 				self.addModifier(20)
 
 		# mood level at which someone will commit suicide is currently
@@ -236,9 +246,9 @@ class Person:
 		# Rapport decays towards 0 by a set value per season
 		for r in self.rapport.keys():
 			if self.getRapport(r) >= RAPPORT_DECAY:
-				self.updateRapport(-RAPPORT_DECAY)
+				self.updateRapport(r, -RAPPORT_DECAY)
 			elif self.getRapport(r) <= -RAPPORT_DECAY:
-				self.updateRapport(RAPPORT_DECAY)
+				self.updateRapport(r, RAPPORT_DECAY)
 			else:
 				self.rapport[r] = 0
 
