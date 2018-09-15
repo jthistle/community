@@ -1,0 +1,23 @@
+body {
+	margin: 0;
+	font-family: sans-serif;
+	background-image: url("footer_lodyas.png");
+	background-repeat: repeat;
+	font-size: 16px;
+	color: white;
+}
+
+#mainContainer {
+	display: flex;
+	justify-content: center;
+}
+#communityEventLog, #personEventLog {
+	/* border: 0.1rem solid #EEE; */
+	background: #222;
+	border-radius: 1rem;
+	padding: 1rem;
+	margin: 1rem;
+	max-height: 25rem;
+	overflow: hidden;
+	flex-grow: 1;
+}

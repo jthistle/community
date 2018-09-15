@@ -42,13 +42,18 @@ def saveCommunity(userId, c):
 
 
 def returnMessage(s):
-	print(json.dumps({"reponseType": "information", "text": s}))
+	print(json.dumps({"responseType": "information", "value": str(s)}))
+
+
+def returnError(s):
+	print(json.dumps({"responseType": "error", "value": "error: "+str(s)}))
 
 
 try:
 	if len(sys.argv) > 2:
 		userId = sys.argv[1]
 		arg = sys.argv[2]
+		otherArgs = sys.argv[3:]
 		current = None
 
 		if arg == "getState":
@@ -74,27 +79,65 @@ try:
 			else:
 				returnMessage("no file to remove")
 
+		elif arg == "passTime":
+			current = loadCommunity(userId)
+			if current:
+				current.passTime()
+				returnMessage("done")
+			else:
+				returnError("not initialised")
+
 		elif arg == "getCommunityLog":
 			current = loadCommunity(userId)
 			if current:
-				print(json.dumps(current.eventLog))
+				if otherArgs[0] == "latest":
+					tempLog = []
+					for i in range(len(current.eventLog)-1, -1, -1):
+						tempLog.append(current.eventLog[i])
+						if current.eventLog[i][0] == "=":
+							break
+
+					print(json.dumps({"responseType": "array", "value": list(reversed(tempLog))}))
 			else:
-				returnMessage("error: not initialised")
+				returnError("not initialised")
+
+		elif arg == "getPersonLog":
+			current = loadCommunity(userId)
+			if current:
+				if otherArgs[0] == "latest":
+					# TODO: debug replace
+					eventLog = current.families[0].people[0].eventLog
+					tempLog = []
+					for i in range(len(eventLog)-1, -1, -1):
+						tempLog.append(eventLog[i])
+						if eventLog[i][0] == "=":
+							break
+					print(json.dumps({"responseType": "array", "value": list(reversed(tempLog))}))
+			else:
+				returnError("not initialised")
+
+		elif arg == "getFullPersonLog":
+			current = loadCommunity(userId)
+			if current:
+				# TODO: debug replace
+				print(json.dumps({"responseType": "array", "value": current.families[0].people[0].eventLog}))
+			else:
+				returnError("not initialised")
+
 
 		elif arg == "testGetName":
 			current = loadCommunity(userId)
 			if current:
 				name = current.families[0].people[0].printableFullName()
-				print(json.dumps({"responseType": "value", "name": name}))
+				print(json.dumps({"responseType": "string", "value": name}))
 			else:
-				returnMessage("error: not initialised")
+				returnError("not initialised")
 		else:
-			returnMessage("unrecognised command "+arg)
+			returnError("unrecognised command "+arg)
 
 		if current:
 			saveCommunity(userId, current)
 	else:
-		returnMessage("error: not enough argumuents")
-
+		returnError("not enough argumuents")
 except Exception as e:
-	returnMessage(e)
+	returnError(e)
