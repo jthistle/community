@@ -7,17 +7,102 @@ body {
 	color: white;
 }
 
-#mainContainer {
+.row {
+	width: 100%;
 	display: flex;
 	justify-content: center;
+	flex-wrap: nowrap;
 }
-#communityEventLog, #personEventLog {
+
+@media only screen and (max-width: 600px){
+	.row {
+		flex-wrap: wrap;
+	}
+}
+
+
+#mainContainer {
+	
+}
+
+#communityEventLog, #personEventLog, #familyList, #personList, #inspector  {
 	/* border: 0.1rem solid #EEE; */
 	background: #222;
 	border-radius: 1rem;
-	padding: 1rem;
 	margin: 1rem;
-	max-height: 25rem;
-	overflow: hidden;
+}
+
+#communityEventLog, #personEventLog {
+	padding: 1rem;
 	flex-grow: 1;
+	overflow: hidden;
+	max-height: 25rem;
+	min-width: 10rem;
+}
+
+#familyList, #personList {
+	height: 0%;
+	padding: 0rem;
+	flex-grow: 0;
+}
+
+#inspector {
+	height: 0%;
+	padding: 1rem;
+	flex-grow: 1;
+}
+
+#inspector #heading {
+	font-size: 1.2rem;
+	font-weight: bold;
+	padding-bottom: 0.5rem;
+}
+
+.family, .person {
+	padding: 0.5rem 0;
+	width: 100%;
+	border-bottom: 1px solid #555;
+	-webkit-transition: background-color 0.5s; /* Safari */
+    transition: background 0.5s;
+}
+
+.family:hover, .person:hover {
+	background-color: #444;
+}
+
+.family .selected, .person .selected {
+	background-color: #444;
+}
+
+.family *, .person * {
+	padding: 1rem;
+}
+
+.family:last-child, .person:last-child {
+	border: none;
+	border-bottom-left-radius: 1rem;
+	border-bottom-right-radius: 1rem;
+}
+
+.family:first-child, .person:first-child {
+	border-top-left-radius: 1rem;
+	border-top-right-radius: 1rem;
+}
+
+#debug, #error, #userId {
+	font-size: 1rem;
+	margin-left: 1rem;
+}
+
+#debug {
+	color: green;
+}
+
+#error {
+	color: red;
+}
+
+#userId {
+	font-size: 0.8rem;
+	color: grey;
 }

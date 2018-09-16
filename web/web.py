@@ -116,22 +116,33 @@ try:
 			else:
 				returnError("not initialised")
 
-		elif arg == "getFullPersonLog":
+		elif arg == "getFamilies":
 			current = loadCommunity(userId)
 			if current:
-				# TODO: debug replace
-				print(json.dumps({"responseType": "array", "value": current.families[0].people[0].eventLog}))
+				toReturn = [f.familyName for f in current.families]
+				print(json.dumps({"responseType": "array", "value": list(toReturn)}))
 			else:
 				returnError("not initialised")
 
-
-		elif arg == "testGetName":
+		elif arg == "getPeople":
 			current = loadCommunity(userId)
 			if current:
-				name = current.families[0].people[0].printableFullName()
-				print(json.dumps({"responseType": "string", "value": name}))
+				ind = int(otherArgs[0])
+				toReturn = [p.firstName() for p in current.families[ind].people]
+				print(json.dumps({"responseType": "array", "value": list(toReturn)}))
 			else:
 				returnError("not initialised")
+
+		elif arg == "inspectPerson":
+			current = loadCommunity(userId)
+			if current:
+				familyInd = int(otherArgs[0])
+				personInd = int(otherArgs[1])
+				toReturn = current.families[familyInd].people[personInd].inspect();
+				print(json.dumps({"responseType": "string", "value": toReturn}))
+			else:
+				returnError("not initialised")
+
 		else:
 			returnError("unrecognised command "+arg)
 
