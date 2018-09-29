@@ -668,68 +668,70 @@ class Person:
 
 	def attributesAsDescription(self):
 		toReturn = []
+		veryThresh = 0.7
 		for attr in self.attributes.keys():
 			val = self.getAttr(attr)
+
 			if attr == "o":
-				if val > 0.8:
+				if val > veryThresh:
 					toReturn.append("very inventive and creative")
 				elif val > 0.5:
 					toReturn.append("fairly inventive and creative")
-				elif val > 0.2:
+				elif val > 1-veryThresh:
 					toReturn.append("fairly consistent and cautious")
 				else:
 					toReturn.append("very consistent and cautious")
 			elif attr == "c":
-				if val > 0.8:
+				if val > veryThresh:
 					toReturn.append("very efficient and organised")
 				elif val > 0.5:
 					toReturn.append("fairly efficient and organised")
-				elif val > 0.2:
+				elif val > 1-veryThresh:
 					toReturn.append("fairly easy-going and careless")
 				else:
 					toReturn.append("very easy-going and careless")
 			elif attr == "e":
-				if val > 0.8:
+				if val > veryThresh:
 					toReturn.append("very outgoing and energetic")
 				elif val > 0.5:
 					toReturn.append("fairly outgoing and energetic")
-				elif val > 0.2:
+				elif val > 1-veryThresh:
 					toReturn.append("fairly solitary and reserved")
 				else:
 					toReturn.append("very solitary and reserved")
 			elif attr == "a":
-				if val > 0.8:
+				if val > veryThresh:
 					toReturn.append("very friendly and compassionate")
 				elif val > 0.5:
 					toReturn.append("fairly friendly and compassionate")
-				elif val > 0.2:
+				elif val > 1-veryThresh:
 					toReturn.append("fairly antagonistic and detatched")
 				else:
 					toReturn.append("very antagonistic and detatched")
 			elif attr == "n":
-				if val > 0.8:
+				if val > veryThresh:
 					toReturn.append("very insecure and nervous")
 				elif val > 0.5:
 					toReturn.append("fairly insecure and nervous")
-				elif val > 0.2:
+				elif val > 1-veryThresh:
 					toReturn.append("fairly secure and confident")
 				else:
 					toReturn.append("very secure and confident")
 			elif attr == "p":
-				if val > 0.8:
+				if val > veryThresh:
 					toReturn.append("very good-looking")
 				elif val > 0.5:
 					toReturn.append("fairly good-looking")
-				elif val > 0.2:
+				elif val > 1-veryThresh:
 					toReturn.append("not very good-looking")
 				else:
 					toReturn.append("not good-looking")
 			elif attr == "i":
-				if val > 0.8:
+				if val > veryThresh:
 					toReturn.append("very intelligent")
 				elif val > 0.5:
 					toReturn.append("fairly intelligent")
-				elif val > 0.2:
+				elif val > 1-veryThresh:
 					toReturn.append("not very intelligent")
 				else:
 					toReturn.append("not intelligent")
@@ -745,20 +747,20 @@ class Person:
 		so = self.sociopathy()
 
 		toReturn = []
-		if em > 0.8:
+		if em > 0.7:
 			toReturn.append("very emotional")
 		elif em > 0.5:
 			toReturn.append("fairly emotional")
-		elif em > 0.2:
+		elif em > 0.3:
 			toReturn.append("fairly unemotional")
 		else:
 			toReturn.append("very unemotional")
 
-		if po > 0.8:
+		if po > 0.7:
 			toReturn.append("very left-wing")
 		elif po > 0.5:
 			toReturn.append("centre-left-wing")
-		elif po > 0.2:
+		elif po > 0.3:
 			toReturn.append("centre-right-wing")
 		else:
 			toReturn.append("very right-wing")

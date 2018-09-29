@@ -12,7 +12,7 @@ CAP_CUTOFF = 3.5
 LIFE_EXPECTANCY = 40*4
 # standard deviation for life expectancy random gaussian distribution
 LIFE_EXPECTANCY_SD = 5*4
-GEN_ATTR_SD = 0.2
+GEN_ATTR_SD = 0.5/3
 ARTISTIC = ["author", "musician", "artist"]
 
 START_CHILDREN_MAX_AGE = 12*4
@@ -26,7 +26,11 @@ HARSH_WINTER_MOD = 0.5
 
 YIELD_MOD_MIN = 0.8
 YIELD_MOD_MAX = 1.2
-YIELD_MOD_SD = 0.1
+YIELD_MOD_SD = 0.2/3
+
+INCOME_MOD_MIN = 1.5
+INCOME_MOD_MAX = 0.5
+INCOME_MOD_SD = 0.5/3
 
 WORKING_CHILD_MIN_AGE = 8*4
 

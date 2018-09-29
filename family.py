@@ -162,7 +162,7 @@ class Family:
 			startFood = self.food  # used to calculate profit
 
 			baseIncome = MERCHANT_BASE_INCOME
-			incomeModifier = min(1.5, max(0.5, random.gauss(1, 0.2)))
+			incomeModifier = min(YIELD_MOD_MAX, max(YIELD_MOD_MIN, random.gauss(1, YIELD_MOD_SD)))
 			for p in self.people:
 				if p.isChild():
 					continue
