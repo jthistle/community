@@ -36,26 +36,37 @@ body {
 	padding: 1rem;
 	flex-grow: 1;
 	overflow: hidden;
-	max-height: 25rem;
 	min-width: 10rem;
 }
 
-#familyList, #personList {
+#familyListContainer, #personListContainer {
 	height: 0%;
 	padding: 0rem;
 	flex-grow: 0;
 }
 
-#inspector {
+#familyList, #personList, #inspector {
+	margin-top: 0.4rem;
+}
+
+#inspectorContainer {
 	height: 0%;
-	padding: 1rem;
 	flex-grow: 1;
+}
+
+#inspector {
+	padding: 1rem;
 }
 
 #inspector #heading {
 	font-size: 1.2rem;
 	font-weight: bold;
 	padding-bottom: 0.5rem;
+}
+
+.listLabel {
+	margin: 0 0 0 1rem;
+	color: #BBB;
 }
 
 .family, .person {

@@ -24,43 +24,52 @@
 		</form>
 		<div id="mainContainer">
 			<div class="row">
-				<div id="familyList">
-					<div class="family">
-						<span>Test Family</span>
-					</div>
-					<div class="family">
-						<span>Test Family</span>
-					</div>
-					<div class="family">
-						<span>Test Family</span>
-					</div>
-				</div>
-				<div id="personList">
-					<div class="person">
-						<span>Test Person</span>
-					</div>
-					<div class="person">
-						<span>Test Person</span>
-					</div>
-					<div class="person">
-						<span>Test Person</span>
+				<div id="familyListContainer">
+					<span class="listLabel">Families</span>
+					<div id="familyList">
+						<div class="family">
+							<span>Test Family</span>
+						</div>
+						<div class="family">
+							<span>Test Family</span>
+						</div>
+						<div class="family">
+							<span>Test Family</span>
+						</div>
 					</div>
 				</div>
-				<div id="inspector">
-					<div id="heading">
-						Inspector heading
+				<div id="personListContainer">
+					<span class="listLabel">People</span>
+					<div id="personList">
+						<div class="person">
+							<span>Test Person</span>
+						</div>
+						<div class="person">
+							<span>Test Person</span>
+						</div>
+						<div class="person">
+							<span>Test Person</span>
+						</div>
 					</div>
-					<div id="content">
-						Test. Lorem ipsum dolar sit amet.
+				</div>
+				<div id="inspectorContainer">
+					<span class="listLabel">Inspector</span>
+					<div id="inspector">
+						<div id="heading">
+							No person selected
+						</div>
+						<div id="content">
+							Pick a person to get started.
+						</div>
 					</div>
 				</div>
 			</div>
 			<div class="row">
 				<div id="communityEventLog">
-
+					Loading...
 				</div>
 				<div id="personEventLog">
-
+					No person selected.
 				</div>
 			</div>
 		</div>

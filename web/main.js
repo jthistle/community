@@ -53,11 +53,21 @@ $( document ).ready(function(){
 			$
 		});
 
-		if (currentPersonInd){
+		if (currentPersonInd != null){
 			runCommand("inspectPerson", [currentFamilyInd, currentPersonInd], function(response){
 				doDebug(response);
-				newValue = response["value"].split("\n").join("<br />");
-				$(" #inspector ").html("<div id='content'>"+newValue+"</div>");
+				inspection = response["value"];
+				personName = inspection["name"];
+				attributes = inspection["attributes"];
+				flavour = inspection["flavour"].split("\n").join("<br />");
+				$(" #inspector ").html("");
+				$(" #inspector ").append("<div id='heading'>"+personName+"</div>");
+				$(" #inspector ").append("<div id='content'>"+flavour+"</div>");
+			});
+
+			runCommand("getPersonLog", [currentFamilyInd, currentPersonInd, "latest"], function(response){
+				doDebug(response);
+				$(" #personEventLog ").html(response["value"].join("<br />"));
 			});
 		}
 
@@ -65,18 +75,12 @@ $( document ).ready(function(){
 			doDebug(response);
 			$(" #communityEventLog ").html(response["value"].join("<br />"));
 		});
-
-		runCommand("getPersonLog", ["latest"], function(response){
-			doDebug(response);
-			$(" #personEventLog ").html(response["value"].join("<br />"));
-		});
 	};
 
 	updateDisplay();
 
 	$(" #passTimeBtn ").on("click", function(){
 		runCommand("passTime", [], function(response){
-			console.log("test");
 			doDebug(response);
 			updateDisplay();
 		});
@@ -84,6 +88,7 @@ $( document ).ready(function(){
 
 	$(" #familyList ").on("click", ".family", function(){
 		currentFamilyInd = $(this).index();
+		currentPersonInd = null;
 		updateDisplay();
 	});
 

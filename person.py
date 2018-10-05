@@ -867,6 +867,67 @@ class Person:
 
 		return "\n".join(toReturn)
 
+	def inspectWeb(self):
+		'''
+		Returns inspection data in a web-readable format
+		'''
+		toReturn = {}
+		toReturn["name"] = self.printableFullName()
+		toReturn["attributes"] = self.attributes
+
+		flavourText = []
+		if self.alive:
+			flavourText.append("Aged {}".format(self.ageToString()))
+			flavourText.append("Gender {}".format(self.gender))
+			flavourText.append(self.attributesAsDescription()+" "+self.otherAttributesAsDescription())
+			flavourText.append("{} is feeling {} {}.".format(self.firstName(), self.oneWordMood(), self.moodReasons()))
+			flavourText.append("{}.".format(self.friends()))
+			if self.married:
+				if self.partner.alive:
+					flavourText.append("{} is married to {}.".format(self.firstName(), self.partner.printableFullName()))
+				else:
+					flavourText.append("{} is a widow(er).".format(self.firstName()))
+			elif self.partner is not None:
+				flavourText.append("{} has been going out with {} for {} seasons.".format(
+					self.firstName(), self.partner.printableFullName(), self.timeWithPartner))
+			if self.isMayor:
+				flavourText.append("{} is the mayor of the community.".format(self.firstName()))
+		else:
+			deathDate = self.deathData["date"]
+			flavourText.append("RIP: {} - {}".format(self.dateToString(deathDate-self.age), self.dateToString(deathDate)))
+			if self.gender == "female" and "nee" in self.deathData.keys():
+				flavourText.append("Née {}, gender {}".format(self.deathData["nee"], self.gender))
+			else:
+				flavourText.append("Gender {}".format(self.gender))
+
+			if len(self.keyEvents) > 0:
+				toAdd = ""
+				for e in self.keyEvents:
+					toAdd = toAdd + "In {}, {} {}. ".format(self.dateToString(e[0]), self.firstName(), e[1])
+				flavourText.append(toAdd)
+
+			flavourText.append((self.attributesAsDescription()+" "+self.otherAttributesAsDescription()).replace(
+				" is ", " was "))
+			if self.married:
+				flavourText.append("{} was married to {}.".format(self.firstName(), self.partner.printableFullName()))
+			flavourText.append("{} was a parent to {} child(ren)".format(self.firstName(), len(self.children)))
+
+			bfs = self.deathData["bestFriends"]
+			if len(bfs) == 0:
+				flavourText.append("{} was not missed by anyone outside their family.".format(self.firstName()))
+			else:
+				toAdd = "{} was missed by ".format(self.firstName())
+				toAdd = toAdd + ", ".join([f.printableFullName() for f in bfs][:-1])
+				if len(bfs) == 1:
+					toAdd = toAdd + "{}.".format(bfs[0].printableFullName())
+				else:
+					toAdd = toAdd + ", and {}.".format(bfs[-1].printableFullName())
+				flavourText.append(toAdd)
+
+		toReturn["flavour"] = "\n".join(flavourText)
+
+		return toReturn
+
 	def __str__(self):
 		toReturn = []
 		toReturn.append("=== {} {}".format(self.name[0], self.name[1]))

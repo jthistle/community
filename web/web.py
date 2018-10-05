@@ -104,9 +104,11 @@ try:
 		elif arg == "getPersonLog":
 			current = loadCommunity(userId)
 			if current:
-				if otherArgs[0] == "latest":
+				familyInd = int(otherArgs[0])
+				personInd = int(otherArgs[1])
+				if otherArgs[2] == "latest":
 					# TODO: debug replace
-					eventLog = current.families[0].people[0].eventLog
+					eventLog = current.families[familyInd].people[personInd].eventLog
 					tempLog = []
 					for i in range(len(eventLog)-1, -1, -1):
 						tempLog.append(eventLog[i])
@@ -138,8 +140,8 @@ try:
 			if current:
 				familyInd = int(otherArgs[0])
 				personInd = int(otherArgs[1])
-				toReturn = current.families[familyInd].people[personInd].inspect();
-				print(json.dumps({"responseType": "string", "value": toReturn}))
+				toReturn = current.families[familyInd].people[personInd].inspectWeb()
+				print(json.dumps({"responseType": "array", "value": toReturn}))
 			else:
 				returnError("not initialised")
 
