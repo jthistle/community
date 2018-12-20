@@ -8,3 +8,6 @@ install:
 script:
   - ./tests.py
   - ./linter.sh
+notifications:
+  webhooks:
+    - http://jamespi.hopto.org/testwebhooks/travishooks.php

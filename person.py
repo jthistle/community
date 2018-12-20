@@ -867,6 +867,8 @@ class Person:
 					toAdd = toAdd + ", and {}.".format(bfs[-1].printableFullName())
 				toReturn.append(toAdd)
 
+		# toReturn.append("Will die at: {} yrs {} seasons".format(self.lifetime//4, int(self.lifetime%4)))
+
 		return "\n".join(toReturn)
 
 	def __str__(self):
