@@ -14,7 +14,7 @@ class Community:
 	__baseYear = BASE_YEAR
 
 	def __init__(self):
-		self.families = []asdasdasdas
+		self.families = []
 		self.deadFamilies = []
 		self.date = 0  # SET TO 0 IF NOT
 		self.harshWinter = False
